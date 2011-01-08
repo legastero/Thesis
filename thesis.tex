@@ -1,0 +1,72 @@
+\documentclass[10pt]{ClemsonThesis}
+\usepackage{listings}
+
+\title{My Thesis: Needs a Better Title}
+
+\department{School of Computing}
+\documentType{Thesis}
+\major{Computer Science}
+\degree{Master of Science}
+\graduationMonth{May}
+\graduationYear{2011}
+\author{Lance Joshua Thomas Stout}
+\committeeChair{Dr. Sebastien Goasguen}
+\committeeMemberOne{Dr. Steve Stevenson}
+\committeeMemberTwo{Dr. ?}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={black},
+    citecolor={black},
+    filecolor={black},
+    urlcolor={black},
+    pdftitle={\theTitle},
+    pdfauthor={\theAuthor},
+    pdfsubject={\theDocumentType},
+    pdfkeywords={Clemson University, 
+                 \theDepartment, 
+                 \theDocumentType, 
+                 \theMajor, 
+                 \theDegree},
+    pdfstartpage={1},
+}
+
+
+\renewcommand\lstlistlistingname{List of Listings}
+
+
+\begin{document}
+    \frontmatter
+    \addtotoc{Title Page}{\maketitle}
+    \doublespacing
+    \setcounter{page}{2}
+    \addtotoc{Abstract}{\input{abstract.tex}}
+    \addtotoc{Dedication}{\input{dedication.tex}}
+    \addtotoc{Acknowledgments}{\input{acknowledgments.tex}}
+    \singlespacing
+    \tableofcontents
+    \clearpage
+    \addtotoc{List of Tables}{\listoftables}
+    \addtotoc{List of Figures}{\listoffigures}
+    \addtotoc{List of Listings}{\lstlistoflistings}
+
+
+    \mainmatter 
+    \doublespacing
+    \inputfile{introduction.tex}
+    \inputfile{conclusions.tex}
+
+
+    %\begin{appendices}
+    %    \begin{subappendices}
+    %        \inputfile{appendixA.tex}
+    %        \inputfile{appendixB.tex}
+    %        \inputfile{appendixC.tex}
+    %    \end{subappendices}
+    %\end{appendices}
+
+
+    \singlespacing
+    \bibliographystyle{plain}
+    \addtotoc{Bibliography}{\bibliography{bibliography}}
+\end{document}
