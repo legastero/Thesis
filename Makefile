@@ -14,7 +14,7 @@ TARGET=thesis
 #
 # Sources
 #
-SOURCES=*.tex
+SOURCES=*.tex *.bib
 
 # 
 # File-extensions to DELETE recursive from here

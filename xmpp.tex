@@ -1,10 +1,132 @@
-\chapter{XMPP}
+\chapter{XMPP: Extensible Messaging and Presence Protocol}
+\label{chap:XMPP}
+
+At the start of 1999, an open instant messaging protocol was released by Miller
+under the name Jabber \cite{XSF-History}, along with a server implementation,
+\textit{jabberd}. Unlike the various commercial instant messaging protocols
+provided by America On-Line (AOL) \cite{AIM}, Microsoft \cite{MSN} and Yahoo
+\cite{Yahoo} that required reverse engineering to create third-party clients,
+Jabber was an open specification based on streaming Extensible Markup Language
+(XML).
+
+In the following year, the Internet Engineering Task Force (IETF) finished work
+on both a model and requirements for an \textit{Internet Messaging and Presence
+Protocol} (IMPP) \cite{RFC2778}\cite{RFC2779}; no implementation was produced
+by the working group, and in 2002 the Jabber community had organized enough
+to submit the Jabber protocol as a proposed implementation for IMPP, but with
+the name changed to the \textit{Extensible Messaging and Presence Protocol}
+\cite{RFC3920}\cite{RFC3921}. In early 2004, the XMPP specifications were
+formalized and approved by the IETF as Proposed Standards \cite{XSF-History}.
+The protocol continues to be updated and expanded by the XMPP Standards
+Foundation (XSF).
 
 \section{The XMPP Network}
+\label{sec:The-XMPP-Network}
 
-\section{Types of XMPP Agents}
+XMPP defines two wire-format protocols to enable server to client and server to
+server communications. The result is a decentralized client-server architecture,
+similar in structure to the one used for email with the \textit{Simple Mail
+Transfer Protocol} (SMTP). Each server maintains long-lived connections
+to many clients, and optionally connections to other XMPP servers. For
+the most popular server implementation, \texttt{ejabberd} \cite{ejabberd}
+\cite{XSF-Services}, accepting upwards of twenty-thousand clients on a regular
+basis is possible \cite{Jabber.ru}, particularly when implementation specific
+clustering is used to spread server loads across multiple physical machines
+\cite{ejabberd-cluster}. Figure \ref{fig:Jabber.ru-Statistics} shows a snapshot
+of the daily usage of the the Russian Jabber.ru XMPP server, which processes
+approximately fourteen thousand client connections at any given time. Other
+large XMPP installations, notably Google's GTalk \cite{GTalk} and Facebook's
+chat \cite{Facebook} services, are able to accept, through clustering, several
+million clients at once.
+
+While many server implementations provide the ability to cluster, XMPP itself
+does not define a clustering mechanism. Instead, it provides a mechanism for
+separate server installations to \textit{federate}, allowing communications
+between clients hosted by either server. Unlike the federation allowed by
+SMTP, XMPP mandates at most two servers will process any message between two
+clients; in SMTP, the number of intermediate servers in unbounded. The limit on
+intermediate servers is aimed at limiting message spoofing and other types of
+spam common in the SMTP network. Figure \ref{fig:XMPP-Network} shows the 
+various configurations an XMPP network may take.
 
 \section{Jabber IDentifiers (JIDs)}
+\label{sec:JIDs}
+
+Each entity within an XMPP network is addressable using one or more
+\textit{Jabber Identifiers}, or JIDs \cite{RFC3920}. The JID used by any
+connected entity is globally unique, based on the Domain Name System (DNS).
+JIDs commonly look similar to e-mail addresses, but with an additional section:
+\texttt{localpart@domainpart/resourcepart}. The \texttt{<domainpart>} portion
+of the JID is the only required section. JIDs for servers consist solely
+of the domain name exposing the XMPP service (DNS service, or SRV, records
+can be used to allow a server to support a domain different from the domain
+of the machine on which it is running \cite{XMPP-DNS}). User accounts on a
+server are identified by the \texttt{<localpart>} section of the JID; when
+only the form \texttt{localpart@domainpart} is used, the result is called
+a \textit{bare JID}. When a client connects to a server using an account's
+bare JID, then the connection is assigned a resource value to distinguish
+it from any other connections already established by that user account;
+a JID with all three sections is referred to as a \textit{full JID}, and
+it is the full JID that is globally unique. To demonstrate, if a client
+connects to the \texttt{kestrel.cs.clemson.edu} server using the bare JID
+\texttt{user@kestrel.cs.clemson.edu}, then the particular connection established
+may be assigned the full JID \texttt{user@kestrel.cs.clemson.edu/133742}.
+
+\section{Types of XMPP Agents}
+\label{sec:Types-of-XMPP-Agents}
+
+Within the network are four types of entities, or agents, which can be marked
+on a continuum of scalability. The first is the regular XMPP client; many
+implementations for clients exist, notably for use with instant messaging by a
+human. However, many client agents exist as automated programs, or \textit{bots}
+\cite{XMPP-Bots}, to provide services to other clients in the network. Each
+client connection is associated with a unique full JID (server implementations
+are free to decide to reject duplicate full JIDs connections or terminate the
+existing connection in favor of the new one \cite{XMPP-JID-Conflict}). Under
+the XMPP Design Guidelines, clients are typically kept simple, offloading as
+much functionality as possible onto the server, making it easier for multiple
+implementations to work together \cite{XEP-0134}.
+
+The next step up in terms of scalability is the external server component.
+XMPP acknowledges that servers will not always provide built-in support
+for all desired features; thus, servers may be easily extended through
+components. External components are separate programs, possibly running on a
+different machine than the server, that are trusted by the server. A standard
+wire-protocol is used between servers and components, making external components
+interroperable with any server implementation.Each component is assigned a
+subdomain from domain used by the server, and all JIDs using that subdomain
+are forward by the server with no additional processing to the component;
+it is left to the component how to interpret the JIDs provided to it. For
+example, a multi-user chat component will treat the username portion of a JID
+as the chat room name, and the resource as a participant's nickname within
+the room, i.e. for the component \texttt{conference.jabber.org}, the JID
+\texttt{sleek@conference.jabber.org/Lance} would refer to the participant named
+``Lance'' within the ``sleek'' chat room on the \texttt{jabber.org} server.
+
+The greater scalability afforded by a component is due to the server's lack
+of responsibility for the JIDs used by the component. For a normal client,
+the server is tasked with maintaining a roster of subscriptions between the
+client and other entities in the network. For human centered clients, this
+relationship works well due to typically small roster sizes for which the
+server is optimized. As roster sizes increase, two scalability issues emerge.
+The first is that the optimization assumption of small rosters is violated,
+potentially impacting performance based on the storage mechanisms used. The
+second is that a client's roster is sent to the client in a single stanza as
+part of the initialization procedure of the XMPP session. Stanzas are not
+interruptable -- all other stream communications to the client are blocked while
+the roster is transmitted \cite{XMPP-Interruptable}. For rosters with several
+thousand entries, this places a severe penalty on start up times for agents and
+on the amount of networking traffic used \cite{XMPP-Component-Scaling}. For a
+component, no roster is maintained by the server, leaving that responsibility to
+the component itself.
+
+The final two entity types are internal server components and servers themselves.
+Internal server components receive the same benefits as external components, but
+they are implemented in a server-dependent fashion. Their main advantage is the
+ability to hook directly into the server's internals to provide services that
+would not be as easily done otherwise. The final tier of potential scalability
+is to create a custom implementation that speaks the server to server protocol,
+eliminating the need for many features provided by traditional servers.
 
 \section{Stanzas}
 
