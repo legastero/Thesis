@@ -1,57 +1,43 @@
 \chapter{Kestrel}
-\section{Kestrel}
+\label{chap:Kestrel} 
 
-\label{sec:Kestrel} Started in the summer of 2009, Kestrel is a job
-scheduling system based on the Extensible Messaging and Presence Protocol,
-or XMPP \cite{Saint-Andre2004}\cite{Saint-Andre2004a}. The original
-environment for which Kestrel was designed to manage was disparate
-collections of virtual machines pooled together into a single cluster,
-or a Virtual Organization Cluster (VOC) \cite{Murphy2009} as shown
-in figure \ref{fig:Kestrel-Arch}. However, compute nodes in VOCs
-are temporary and can be created and destroyed on demand, or the virtual
-machines may be killed by the hosting resource provider without warning.
-XMPP provides a solution for managing heterogeneous, intermittently
-connecting compute elements through the use of service discovery and
-presence notifications; Kestrel builds on these features with XMPP
-subprotocols for requesting and dispatching tasks in such a cloud
-environment.
+Many-Task Computing (MTC) applications span a broad range of possible
+configurations, but utilizing “large num- bers of computing resources over
+short periods of time to accomplish many computational tasks, where the primary
+metrics are in seconds” [1] is one of the emphasized aspects. Marshalling
+and releasing computational resources with the temporal granularity needed for
+such applications is prob- lematic on the grid and in overlays such as Virtual
+Organi- zation Clusters (VOC) [2, 3] where compute nodes can be created and
+destroyed on demand. Kestrel is designed to explore methods of creating a fault-
+tolerant, scalable, and cross-platform job scheduling system for heterogeneous,
+intermittently connected compute nodes. Kestrel addresses the problem posed
+by interrupted connec- tivity of both computing agents and user agents by
+building on the Extensible Messaging and Presence Protocol (XMPP) [4, 5]. The
+presence notification system provided by XMPP allows Kestrel manager nodes to
+track resource availability in the compute node pool in real time. Kestrel can
+immedi- ately remove computings node from a list of available nodes, preventing
+the scheduling of jobs on nonexistent machines. Other intermittently connected
+agents do not necessarily have to be of a computational nature. For example, a
+small swarm of robotic agents with network capabilities could be joined in a
+resource pool where scheduled jobs are physi- cal actions to be performed. The
+scale of current instant messaging systems indicates that an XMPP based frame-
+work would allow for the creation of extremely large pools of heterogeneos
+agents for real-time computing. The cross- platform criterion is achieved by
+implementing the system in Python [6] using the SleekXMPP [7] library.
 
 
-\subsection{Design Changes}
-
-\label{sec:Kestrel:Changes} Based on the previous year of implementation
-and production use experiences presented in \cite{Stout10}, Kestrel's
-use of XMPP and its protocol design have been reconsidered and redesigned.
-The original protocol was based on XMPP message stanzas containing
-JavaScript Object Notation (JSON) \cite{Crockford} encoded data.
-While workable, the design had several disadvantages that prompted
-the redesign for the STAR experiment.
-
-The first is that combining JSON data with XMPP is an unnecessary
-step that adds overhead, both in terms of parsing time and the increase
-in complexity from managing two data formats. The original use of
-JSON was a leftover from an earlier implementation of a Kestrel-like
-system that did not use XMPP. The SleekXMPP library \cite{SleekXMPP}
-used by Kestrel now provides an easy method for creating and extracting
-XML data from XMPP stanzas. As such, the original ease of use provided
-by JSON was no longer relevant. Kestrel now complies with the XMPP
-Design Guidelines \cite{XEP-0134} provided by the XMPP Standards
-Foundation (XSF) \cite{XSF} by using XML for its protocol.
-
-The second, and more performance impacting disadvantage, was the reliance
-on normal XMPP message stanzas for all communications in the system.
-XMPP message stanzas do not provide strong guarantees of delivery
-for normal server installations; rather, messages are treated as {}``fire
-and forget'' payloads \cite{Saint-Andre2004a}. Ensuring consistency
-between Kestrel's central manager's view of the state of the resource
-pool, in particular nodes that have pending jobs, and the actual state
-of the workers became difficult under high workloads with large numbers
-of workers. The solution was to use another XMPP stanza type called
-an Info/Query (IQ) stanza \cite{Saint-Andre2004a}. IQ stanzas provide
-request-response behavior similar to the semantics of the HTTP methods
-\texttt{GET} and \texttt{SET}. Importantly, XMPP guarantees that every
-IQ request will receive a response, even if it is a response from
-the XMPP server itself to indicate an error has occurred.
+Started in the summer of 2009, Kestrel is a job scheduling system
+based on the Extensible Messaging and Presence Protocol, or XMPP
+\cite{Saint-Andre2004}\cite{Saint-Andre2004a}. The original environment for
+which Kestrel was designed to manage was disparate collections of virtual
+machines pooled together into a single cluster, or a Virtual Organization
+Cluster (VOC) \cite{Murphy2009} as shown in figure \ref{fig:Kestrel-Arch}.
+However, compute nodes in VOCs are temporary and can be created and destroyed
+on demand, or the virtual machines may be killed by the hosting resource
+provider without warning. XMPP provides a solution for managing heterogeneous,
+intermittently connecting compute elements through the use of service discovery
+and presence notifications; Kestrel builds on these features with XMPP
+subprotocols for requesting and dispatching tasks in such a cloud environment.
 
 
 \subsection{Architecture}
@@ -439,23 +425,71 @@ return the number of queued, running, completed, and requested tasks
 for that particular job. Issuing the status request to \texttt{pool@manager.example.org}
 instead will return the number of online, available, and busy workers.
 
-
-\section{Evolution of the Implementation}
-
-\subsection{Phase I}
-
-\subsection{Phase II}
-
-\subsection{Phase III}
-
+\section{Architecture}
 \section{Joining the Worker Pool}
-
 \section{Responding to Worker Failures}
-
 \section{Submitting and Managing Jobs}
-
 \section{Job Scheduling}
-
 \section{Task Dispatch and Execution}
 
-\section{Task Dispatch Rates}
+\section{Evolution of the Implementation and Lessons Learned}
+\label{sec:Evolution}
+During the two years of development, Kestrel underwent significant revisions
+to the underlying architecture, each time re-purposing more of the existing
+XMPP technologies for the tasks of job scheduling and distribution. Kestrel has
+thus moved from simply treating an XMPP connection as a basic socket connection
+with a few added features to leveraging several existing protocols to allow
+for interroperability with other XMPP agents, service discovery, and using
+standard formats for data exchange. As part of this process, the underlying XMPP
+library for Python used by Kestrel, SleekXMPP \cite{SleekXMPP}, was improved
+and expanded to provide support for the features required by Kestrel; complex
+functionality unrelated to job distribution has migrated down to the library
+level, such as advanced support for dynamic handling of service discovery
+requests and external storage for component rosters.
+
+\subsection{JSON over XMPP Message Stanzas}
+The original architecture called for using JavaScript Object Notation (JSON)
+\cite{Crockford} to encode application specific information and to then use XMPP
+message stanzas to carry the information between the manager and worker agents
+in the Kestrel pool. Figure \ref{fig:JSON-message} shows an example of a basic
+job submission under this model. The main advantage of this method was that few
+changes in infrastructure were required. Common XMPP client programs such as
+GTalk or Pidgin could send JSON formatted messages directly, and support for
+parsing the JSON messages already existed as part of a class project that served
+as the precursor to the Kestrel project (under the same name).While workable,
+the design had several disadvantages that necessitated changes during the summer
+of 2010 STAR experiment.
+
+The first disadvantage was that combining JSON data with XMPP is an unnecessary
+step that adds overhead, both in terms of parsing time and the increase
+in complexity from managing two data formats. The XMPP Design Guidelines \cite{XEP-0134}
+provided by the XSF \cite{XSF} dictates that XML should be used for any sub-protocol
+implemented on top of XMPP for this reason.
+
+The second shortcoming, the cause of several performance and stability issues, was
+the reliance on normal XMPP message stanzas for all communications between agents in
+the pool. XMPP message stanzas do not provide strong guarantees of delivery with 
+standard server installations; rather, they are treated as ``fire and forget'' payloads
+\cite{Saint-Andre2004a} with no expectation of a response in receipt. Ensuring consitency
+between Kestrel's central manager's view of the state of the worker pool, in particular
+those workers with pending jobs, and the actual state of the pool became difficult with
+large numbers of workers over an extended period of time.
+
+\subsection{Customized IQ Stanzas}
+To resolve the deficiencies of the JSON over message stanza model, the
+communication channels were moved to use custom XML payloads in IQ stanzas.
+The main benefit of this model was the guaranteed response for any IQ stanza
+sent. In the case of the recipient disconnecting while the IQ is broadcast,
+the XMPP server itself will respond with an error IQ stanza on behalf of the
+disconnected agent. In addition, the SleekXMPP library provides a built-in
+mechanism for blocking execution while waiting for an IQ response, with an
+optional timeout value to handle cases where the recipient received the IQ from
+the server, but does not respond. In addition, in conjunction the customized
+XML payload, the protocols described in sections \ref{sec:Task-Dispatch} and
+\ref{sec:Job-Management} were developed to manage the various work-flows
+required to dispatch tasks and manage jobs. As a final improvement, a SQLite
+\cite{SQLite} database was used to store all application state using SQLAlchemy
+\cite{SQLAlchemy}. A limitation of SQLAlchemy with SQLite was only a single
+thread may access the database. All operations touching the database were
+therefore serialized, which introduced delays in initializing the pool when
+large numbers of workers contacted the manager at once.
