@@ -1,4 +1,444 @@
 \chapter{Kestrel}
+\section{Kestrel}
+
+\label{sec:Kestrel} Started in the summer of 2009, Kestrel is a job
+scheduling system based on the Extensible Messaging and Presence Protocol,
+or XMPP \cite{Saint-Andre2004}\cite{Saint-Andre2004a}. The original
+environment for which Kestrel was designed to manage was disparate
+collections of virtual machines pooled together into a single cluster,
+or a Virtual Organization Cluster (VOC) \cite{Murphy2009} as shown
+in figure \ref{fig:Kestrel-Arch}. However, compute nodes in VOCs
+are temporary and can be created and destroyed on demand, or the virtual
+machines may be killed by the hosting resource provider without warning.
+XMPP provides a solution for managing heterogeneous, intermittently
+connecting compute elements through the use of service discovery and
+presence notifications; Kestrel builds on these features with XMPP
+subprotocols for requesting and dispatching tasks in such a cloud
+environment.
+
+
+\subsection{Design Changes}
+
+\label{sec:Kestrel:Changes} Based on the previous year of implementation
+and production use experiences presented in \cite{Stout10}, Kestrel's
+use of XMPP and its protocol design have been reconsidered and redesigned.
+The original protocol was based on XMPP message stanzas containing
+JavaScript Object Notation (JSON) \cite{Crockford} encoded data.
+While workable, the design had several disadvantages that prompted
+the redesign for the STAR experiment.
+
+The first is that combining JSON data with XMPP is an unnecessary
+step that adds overhead, both in terms of parsing time and the increase
+in complexity from managing two data formats. The original use of
+JSON was a leftover from an earlier implementation of a Kestrel-like
+system that did not use XMPP. The SleekXMPP library \cite{SleekXMPP}
+used by Kestrel now provides an easy method for creating and extracting
+XML data from XMPP stanzas. As such, the original ease of use provided
+by JSON was no longer relevant. Kestrel now complies with the XMPP
+Design Guidelines \cite{XEP-0134} provided by the XMPP Standards
+Foundation (XSF) \cite{XSF} by using XML for its protocol.
+
+The second, and more performance impacting disadvantage, was the reliance
+on normal XMPP message stanzas for all communications in the system.
+XMPP message stanzas do not provide strong guarantees of delivery
+for normal server installations; rather, messages are treated as {}``fire
+and forget'' payloads \cite{Saint-Andre2004a}. Ensuring consistency
+between Kestrel's central manager's view of the state of the resource
+pool, in particular nodes that have pending jobs, and the actual state
+of the workers became difficult under high workloads with large numbers
+of workers. The solution was to use another XMPP stanza type called
+an Info/Query (IQ) stanza \cite{Saint-Andre2004a}. IQ stanzas provide
+request-response behavior similar to the semantics of the HTTP methods
+\texttt{GET} and \texttt{SET}. Importantly, XMPP guarantees that every
+IQ request will receive a response, even if it is a response from
+the XMPP server itself to indicate an error has occurred.
+
+
+\subsection{Architecture}
+
+\label{sec:Kestrel:Architecture} Based on the traditional master-worker
+architecture, Kestrel systems are made of three types of agents: clients,
+workers, and masters. Client agents are basic XMPP clients with just
+the logic needed to submit job submission and status requests. During
+the typical use case, client agents join the system intermittently
+and for just long enough to execute a single command. Currently, a
+command-line script provided with Kestrel is the preferred client
+program, but normal instant messaging clients may be used to monitor
+a Kestrel pool.
+
+A workers is also a basic XMPP client, and is little more than a wrapper
+for executing command line statements. Having a simple worker implementation
+is encouraged by the XMPP Design Guidelines \cite{XEP-0134} which
+states that functionality should be kept in servers when possible.
+As such, running a Kestrel worker agent is a very lightweight process,
+allowing a worker to be easily included even in virtual machines with
+little available memory. Unlike Kestrel clients, workers are intended
+to maintain lengthy connections with the XMPP server so that tasks
+may have time to execute. However, workers are not expected to maintain
+100\% uptime, and the offline presence that is triggered by a disconnection
+will alert the manager to reschedule tasks if necessary.
+
+%
+\begin{figure}
+\caption{\label{fig:Kestrel-Arch} Kestrel builds a scheduling overlay on top
+of Cloud providers. Virtual machines instances containing the Kestrel
+worker agent can be started on any Cloud provider using multiple provisioning
+systems. Once started the instances join the Kestrel pool irrespective
+of the networking setup used by each provider. The Kestrel agents
+initiate the connection and setup a instant messaging channel to receive
+tasks. The Kestrel manager can make use of the XMPP federation capabilities
+to build a scalable pool and establish flocking mechanisms.}
+
+\end{figure}
+
+
+The Kestrel manager is an XMPP component in order to scale to handle
+several thousand worker agents \cite{Moffitt2008}. Manager instances
+are typically run on the same machine as the XMPP server, but could
+also be placed in a VM in a cluster alongside the worker VMs. While
+the current backend for the manager is a SQLite \cite{sqlite} database
+which can not be shared easily by multiple processes, using a larger
+database or a hash value store such as Redis \cite{Redis} would allow
+multiple manager instances on different machines to service a single
+XMPP server, using the common backend to maintain consistent state.
+Such an arrangement would create a clustered manager that still acts
+as a single, logical manager instance. However, current research is
+focused on manager federation such that Kestrel managers servicing
+separate XMPP servers from different organizations may share jobs,
+similar to the flocking mechanism in Condor.
+
+
+\subsection{Well-Known JIDs}
+
+\label{sec:Kestrel:JIDs} Since the Kestrel manager is an XMPP component,
+it may be addressed by many JIDs with different username portions.
+For example, \texttt{pool@manager.example.org} and \texttt{job\_42@manager.example.org}
+will both be delivered to the Kestrel manager. Kestrel reserves two
+particular usernames for interaction with clients and workers. The
+first is \texttt{submit} which may accept job submissions and status
+requests from clients. The second is \texttt{pool} which is contacted
+by workers attempting to join the pool, and by clients requesting
+the pool's status.
+
+Each job accepted by the manager is also given a unique JID username
+of the form: \texttt{job\_\#}, where the \texttt{\#} is replaced by
+the job's ID value. For example, a job with an ID of 37 may be referenced
+as \texttt{job\_37@manager.example.org}. Each job submitted to Kestrel
+may be composed of multiple {}``tasks'', which are the individual
+instances of the job's command to execute. The resource portion of
+a job's JID refers to a particular task, e.g. a worker receiving a
+task from the JID \texttt{job\_37@manager.example.org/99} knows that
+it is executing task 99 from job 37. Once a job has been accepted
+by the manager, a subscription request is made from the job's JID
+to the client's JID, allowing the user to easily monitor the status
+of the job from an IM client as shown in figure \ref{fig:IM-Client}
+
+%
+\begin{figure}
+
+\caption{\label{fig:IM-Client} Monitoring job statuses through a normal instant
+messaging client. Once accepted by the manager, jobs request to be
+added to the user's roster to deliver current status updates. Running
+jobs display themselves as available while queued jobs are displayed
+as away. For finished jobs, an extended away status is shown. The
+status message for each job includes a sequence of four numbers indicating,
+in order, the number of tasks requested, queued, running, and completed.
+Jobs may be canceled from an IM client by removing it from the roster.}
+
+\end{figure}
+
+
+
+\subsection{Joining the Pool}
+
+\label{sec:Kestrel:Joining} Creating the Kestrel pool is done using
+XMPP's service discovery features to detect worker agents and their
+capabilities, as shown in figure \ref{fig:Joining-the-Pool}. Workers
+attempt to join the pool by subscribing to the special manager JID
+\texttt{pool@manager.example.org}. Once the manager is subscribed
+to the potential worker, Kestrel uses the XMPP service discovery feature
+\cite{XEP-0030} as shown in figure \ref{fig:Discover-Worker} to
+determine if the entity is an actual worker. When an XMPP entity receives
+a service discovery (or {}``disco'' request), it returns a list
+of features associated with the entity. The XMPP entity may also group
+features into various aspects or facets of its intended functionalities
+(referred to as nodes \cite{XEP-0030}). Every Kestrel worker will
+advertise its support for executing tasks in a Kestrel pool by including
+the feature \texttt{kestrel:tasks}. Since worker agents may provide
+different resources, such as operating systems or installed libraries,
+workers may also advertise additional capabilities that may be used
+for task matching. Querying the \texttt{kestrel:tasks:capabilities}
+node of the worker's service discovery profile will provide these
+features. It should be noted that using service discovery does add
+a noticeable increase to the startup time of a Kestrel-based VOC due
+to the protocol overhead. However, future implementations should be
+able to overcome this drawback by using an alternative XMPP extension
+\cite{XEP-0115} that includes a hashed version of the worker's features
+in its initial presence notification. The manager would then only
+need to request the original, full feature list once per unique hash
+it receives.
+
+%
+\begin{figure}
+\caption{\label{fig:Joining-the-Pool}The presence subscription and service
+discovery process for joining the Kestrel pool. A worker first initiates
+a bi-directional presence subscription with the manager, allowing
+the manager to know when the worker is available or offline. The manager
+then queries the worker's service descriptions to verify that the
+agent is a worker, and to find the capabilities the worker provides
+that may be used in match making.}
+
+\end{figure}
+
+
+%
+\begin{figure}
+\begin{lstlisting}[language=XML,tabsize=4]
+<iq to="worker21@example.org" type="get">
+  <query xmlns="http://jabber.org/protocol/disco#info" />
+</iq>
+<iq from="worker21@example.org" type="result">
+  <query xmlns="http://jabber.org/protocol/disco#info"> 
+    <feature>kestrel:tasks</feature> 
+  </query> 
+</iq>
+<iq to="worker21@example.org" type="get"> 
+  <query xmlns="http://jabber.org/protocol/disco#info" 
+         node="kestrel:tasks:capabilities" /> 
+</iq>
+<iq from="worker21@example.org" type="result">
+  <query xmlns="http://jabber.org/protocol/disco#info">
+    <feature>Python2.6</feature>
+    <feature>Linux</feature>
+  </query>
+</iq>
+\end{lstlisting}
+\caption{\label{fig:Discover-Worker} Recognizing an XMPP agent as a Kestrel
+worker, and discovering its capabilities. The manager first sends
+an IQ {}``disco'' stanza to the agent; the agent's response must
+include the \texttt{kestrel:tasks} feature in order to be accepted
+as a worker. Once the worker has been recognized, a second {}``disco''
+query is issued, this time to the \texttt{kestrel:tasks:capabilities}
+node of the agent's profile. The resulting list of features are the
+capabilities that the worker offers for use during match making.}
+
+\end{figure}
+
+
+
+\subsection{Dispatching}
+
+\label{sec:Kestrel:Dispatching} Assigning tasks to workers is done
+by sending a task IQ stanza to a worker after it has announced its
+availability as shown in figure \ref{fig:Task-dispatching}. During
+the time period between sending the stanza and receiving a reply,
+the task and worker are marked as pending in the manager's internal
+data store to prevent assignment conflicts. The current design of
+Kestrel limits each worker to accepting only one task instead of multiple
+concurrent tasks; the rationale is to simplify matchmaking for the
+manager by reducing the number of possible worker states. Future implementations
+may remove this limitation. In the event that an error is returned
+(as shown in figure \ref{fig:Task-Stanza}), because the worker has
+reached its task limit or is no longer online, the task is returned
+to the queue to be matched with another worker.
+
+%
+\begin{figure}
+
+\caption{\label{fig:Task-dispatching}The task dispatching and execution process.
+A match making request is triggered when the manager receives an available
+presence from a worker. If a matching job is found, a task is marked
+pending and sent to the worker; if an error is returned or a timeout
+occurs, the task is returned to the queue. Otherwise, the worker broadcasts
+a busy presence to prevent further job matching, and then notifies
+the manager that the task has been started. Once the task's command
+has terminated, a finished notice is sent to the manager to mark the
+task as completed. An optional cleanup step is then performed before
+the worker issues an available presence indicating it is ready for
+the next task.}
+
+\end{figure}
+
+
+As part of the new requirements presented with carrying out the STAR
+experiment, a new task attribute was added for carrying out a cleanup
+phase. After the main command for a task has been executed, the worker
+will report that it has completed the task. However, it will not make
+itself available to receive a new task until the cleanup command has
+completed, if one has been provided. Such an arrangement allows for
+cleanup scripts to shutdown and restart the virtual machine without
+causing the manager to treat the shutdown as a network failure and
+reassigning the task to another worker.
+
+%
+\begin{figure}
+\begin{lstlisting}[language=XML,tabsize=4]
+<iq type="set" to="worker17@example.org" from="job42@manager.example.org/23">
+  <task xmlns="kestrel:task" action="execute"> 
+    <command>/runtask.sh</command> 
+    <cleanup>/cleanfiles.sh</cleanup>
+  </task> 
+</iq>
+<iq type="error" to="job42@manager.example.org/23" from="worker17@example.org">
+  <error xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" type="cancel"> 
+    <condition>resource-constraint</condition> 
+    <text>The worker is already in use.</text> 
+  </error> 
+</iq>
+\end{lstlisting}
+\caption{\label{fig:Task-Stanza} A task start stanza and an error reply. Note
+the task's ID number is given by the resource identifier of the job's
+JID. }
+
+\end{figure}
+
+
+
+\subsection{Task Execution}
+
+\label{sec:Kestrel:Execution} The actual programs executed by workers
+should typically be small shell scripts that manages the task's execution
+cycle, such as downloading input data and uploading any output. These
+scripts will always receive a \textit{final} parameter which is the
+task's ID value; however, additional parameters may be passed when
+submitting the job by including them with the job's command. The task
+ID may also be used as a switch to run different applications with
+a single job. Since Kestrel workers are assumed to be behind a NAT
+boundary, tasks must operate in a pull model; interactions with external
+entities must be done through requests starting from the worker node.
+
+Most applications using Kestrel will need to transfer input data to
+the worker and then transfer output data to the user in some fashion.
+Some scheduler and dispatch systems, such as Condor, provide built-in
+methods for data transfer; however, Kestrel currently does not. While
+data transfers may be included in a future release using XMPP's file
+sharing capabilities, \texttt{wget} and similar command line utilities
+are recommended for now. Transferring files is a largely solved problem
+with scalable solutions. The suggested method is to run a HTTP server
+(or server cluster) to distribute input files. The HTTP protocol supports
+range queries to retrieve sections of a file if needed. A simple upload
+form processor may be used to handle receiving output data from workers.
+
+Once a task's command has been executed, an optional second command
+may be executed for cleanup purposes. For most cases, this cleanup
+script will simply restart the VM to reset its state and release any
+disk space used by copy-on-write instances. The cleanup command is
+split from the main task command so that if the worker VM is restarted,
+the task will not be rescheduled when the manager is notified that
+the worker has disconnected while running a task.
+
+%
+\begin{figure}
+\begin{lstlisting}[language=XML,tabsize=4]
+<iq type="set" to="manager.example.org"> 
+  <job xmlns="kestrel:job" action="submit" queue="50000"> 
+    <command>/runtask.sh</command> 
+    <cleanup>/cleanfiles.sh</cleanup> 
+    <requires>Python2.6</requires> 
+    <requires>SleekXMPP</requires> 
+  </job> 
+</iq>
+\end{lstlisting}
+\caption{\label{fig:Job-Stanza} A job submission stanza with two requirements.
+The\texttt{ queue} attribute specifies the number of times that the
+job will be executed, where each instance is considered a single {}``task''.
+Various \texttt{requires} elements may be added to limit set of workers
+that may run the job's tasks. When using Kestrel to manage a single
+pool shared by various organizations, the organization's identity
+is usually added as a requirement so that the job will run on the
+organization's VMs.}
+
+\end{figure}
+
+
+
+\subsection{Job Management}
+
+\label{sec:Kestrel:Management} Creating and monitoring jobs can now
+be carried out through the command line instead of having to rely
+upon an instant messaging client such as Pidgin \cite{Pidgin} or
+Adium \cite{Adium}. However, as shown in figure \ref{fig:IM-Client},
+important job status information can be received through a client
+program as part of the job JID's presence status updates, such as
+the number of queued, running, and completed tasks. Jobs that are
+accepted, and assigned a JID, may be added to the user's XMPP roster
+(also referred to as a buddy list in other messaging systems). Removing
+the job from the roster will cancel the job and terminate running
+tasks. From the command line, jobs may be submitted, canceled, and
+queried for their current status using the commands shown in figure
+\ref{fig:Commands}.
+
+%
+\begin{figure}
+\begin{lstlisting}[language=XML,tabsize=4]
+<iq type="get" to="submit@manager.example.org"> 
+  <query xmlns="kestrel:status" /> 
+</iq>
+<iq type="result" to="user@example.org"> 
+  <query xmlns="kestrel:status"> 
+    <job owner="user@example.org"> 
+      <queued>3000</queued> 
+      <running>700</running> 
+      <completed>300</completed> 
+      <requested>4000</requested> 
+    </job>
+    <job owner="user@example.org"> 
+      <queued>150</queued> 
+      <running>50</running> 
+      <completed>300</completed> 
+      <requested>500</requested> 
+    </job>
+  </query> 
+</iq>
+\end{lstlisting}
+\caption{\label{fig:Status-Stanza}A job status request stanza and its response.
+Since the query was issued to the job submission JID, the statuses
+of all of the user's jobs are returned. Each status includes the number
+of requested, queued, running, and completed tasks. Issuing the same
+query to a job's JID would return the status of the single job. }
+
+\end{figure}
+
+
+The protocol for submitting a job, shown in figure \ref{fig:Job-Stanza},
+resembles the stanza used to initiate a task, but may also include
+a variable number of \texttt{<requires />} elements. These requirements
+may be matched against the capabilities provided by workers to ensure
+that the job will only run on VMs that have the appropriate libraries
+or belong to the proper organization. To simply the public interface
+for Kestrel through other tools, submissions must be sent to the special
+manager JID \texttt{submit@manager.example.org}.
+
+By setting the \texttt{id} attribute to a job ID and setting \texttt{action=cancel}
+in a job stanza similar to that shown in figure \ref{fig:Job-Stanza},
+a job cancellation request may be submitted.
+
+%
+\begin{figure}
+\begin{tabular}{ll}
+Command  & Result \\
+\hline 
+\texttt{kestrel {[}-q{]} submit <jobfile>}  & Submit a job request. \\
+\texttt{kestrel {[}-q{]} cancel <jobid>}  & Cancel an accepted job. \\
+\texttt{kestrel {[}-q{]} retry <jobid>}  & Return any tasks that completed with errors to the queue to be executed
+again.\\
+\texttt{kestrel {[}-q{]} status {[}<jobid>{]}}  & Request the status of all jobs or a single job. \\
+\texttt{kestrel {[}-q{]} status pool}  & Request the status of the pool. \\
+\end{tabular}\caption{\label{fig:Commands} Available commands for the command line client.}
+
+\end{figure}
+
+
+At any point, the status of a job may be directly requested instead
+of relying on the summarized status included in the job's presence
+updates. Issuing an IQ stanza with a \texttt{kestrel:status} query
+as shown in figure \ref{fig:Status-Stanza} to the JID submit@manager.example.org
+will return the breakdown of task states and the owners for all jobs
+active in the system. The query can be targeted to a job's JID to
+return the number of queued, running, completed, and requested tasks
+for that particular job. Issuing the status request to \texttt{pool@manager.example.org}
+instead will return the number of online, available, and busy workers.
+
 
 \section{Evolution of the Implementation}
 

@@ -169,12 +169,13 @@ and status information, to other agents that have subscribed for it. Each
 \texttt{presence} stanza may include a status message, a value indicating the
 current state of the agent (such as free for chat, away, do not disturb, etc),
 and a priority value indicating the relative importance of the connection
-amongst other connections from the same bare JID, which is used by some servers
-for routing purposes as described in section \ref{sec:XML-Routing}. While it is
-possible to include additional information in a \texttt{<presence />} stanza,
-it is highly discouraged. Presence stanzas are typically the most frequently
-stanzas used within an XMPP network, and thus bandwidth usage must be considered
-and minimized \cite{XMPP-Presence}.
+amongst other connections from the same bare JID. Some servers use the priority
+value when routing stanzas by sending stanzas addressed to the bare JID
+to the resource with the highest priority value. While it is possible to
+include additional information in a \texttt{<presence />} stanza, it is highly
+discouraged. Presence stanzas are typically the most frequently stanzas used
+within an XMPP network, and thus bandwidth usage must be considered and
+minimized \cite{XMPP-Presence}.
 
 Presence stanzas whose \texttt{type} attribute value is in one of
 \texttt{subscribe}, \texttt{subscribed}, \texttt{unsubscribe}, or
@@ -219,18 +220,74 @@ initial \texttt{<iq />} stanza with its response by examining its \texttt{id}
 attribute. Every stanza used by XMPP includes an \texttt{id} attribute, and that
 value is used as the \texttt{id} value of a reply stanza.
 
-\section{XML Routing}
-
 \section{Security Considerations}
+\label{sec:Security-Considerations}
 
 \section{XMPP Extension Proposals (XEPs)}
+\label{sec:XEPs}
 
-\subsection{Service Discovery}
+While the core XMPP specifications are maintained by the IETF, the XMPP
+Standards Foudation is responsible for maintaining additional extensions to
+the specifications and protocols, adding new features or documenting current
+best practices. Such extensions are referred to as XMPP Extension Proposals,
+or XEPs, each of which is assigned a four digit number starting from 0001.
+XEPs are grouped into several categories, including \textit{Draft Standard},
+\textit{Final Standard}, \textit{Experimental}, \textit{Deferred}, among
+others \cite{XMPP-XEP-States}. A XEP in the final standard state is considered
+finished, and will not be updated further. A draft standard XEP is considered
+stable and reliable for implementation, while an experimental XEP is encouraged
+for implementation but may still undergo significant revision. Several XEPs are
+considered fundamental to providing robust and useful XMPP services.
 
-\subsection{Data Forms}
+\subsection{Service Discovery: XEP-0030}
+\label{sec:Service-Discovery}
 
-\subsection{Ad-hoc Commands}
+It is useful and necessary for an entity within an XMPP network to query other
+entities about their identities, supported features, and any related entities
+within the network. For this purpose, XEP-0030 Service Discovery \cite{XEP-0030}
+defines the use of ``disco'', short for service discovery, using \texttt{<iq />}
+stanzas. Disco is broken into two categories: information and items. The information
+portion is used to query and report identities and feature support. The items portion
+is used to return a list of JIDs related to an agent.
 
-\subsection{Entity Capabilities}
+An important concept introduced by XEP-0030 is the idea of a ``node'' for a JID. A node
+refers to an aspect, or facet of the services provided by a JID \cite{XEP-0030}. For
+example, an agent may provide two distinct services. By specifying a node, the disco
+query can be limited to only requesting information about one particular service.
 
-\section{Available Server Implementations}
+An identity in XMPP is a combination of a \texttt{category}, \texttt{type}, \texttt{name}, and
+\texttt{lang}. The category and type values are selected from a predefined set that is used
+to identify the agent as a human facing client, or a server component providing a gateway
+service to another instant messaging network. Features are specified by listing the 
+recognized namespaces used by the supported features.
+
+An agent may also be responsible, or be the authoritative reference, for other JIDs used
+in the network. One such case would be a multi-user chat component's responsibility for
+JIDs for the chat rooms it provides. Each JID provided in the query results may also 
+include a node name to refer to particular services or information resources provided
+by a single JID.
+
+\subsection{Entity Capabilities: XEP-0115}
+\label{sec:Entity-Capabilities}
+
+While service discovery provides a useful and generic mechanism for querying
+for features supported by other entities, the bandwidth required to perform
+to walk through the various nodes provided by a JID to build a complete disco
+profile can be considerable when working with many agents. XEP 0115, Entity
+Capabilities, allows for simplifying the disco process by including a hashed
+version of a node's identities and features in a \texttt{<presence />} stanza.
+When an agent receives such a presence notice, it will query the sender to
+retrieve the full contents matching the given hash value, provided that the
+hash value is one that has not been seen before. Under the assumption that many
+agents will have identical sets of identities and features, due to using the
+same underlying client libraries, the issue of excess bandwidth consumption is
+minimized.
+
+\subsection{Data Forms: XEP-0004}
+\label{sec:Data-Forms}
+
+
+\subsection{Ad-hoc Commands: XEP-0050}.
+\label{sec:Adhoc-Commands}
+
+
