@@ -1,2 +1,33 @@
 \chapter{Conclusions and Discussion}
-Important stuff I found.
+\label{chap:Conclusions}
+As demonstrated with a successful trial experiment with STAR, Kestrel
+is capable of managing large-scale scientific applications in the
+Cloud, with the condition that tasks are able to run independently
+in a bag of tasks model. While Kestrel did not provide file transfer
+capabilities itself, offloading the responsibility to existing infrastructure
+such as HTTP servers proved to be a workable solution, handling over
+seven terabytes of output data. While the VM images used were up to
+twenty five gigabytes in size, KVM's snapshot mode reduced the startup
+times for the VMs by only transferring image data when accessed. Snapshot
+mode also prevented the main image from being modified by running
+instances by writing changes to the VM host's local disk; the addition
+of the task cleanup command to allow for restarting the VM prevented
+exhausting the local hard drive's capacity when shared with other
+VMs.
+
+Current and future work with Kestrel will focus on using multiple
+managers for a single pool. XMPP already provides the federation infrastructure
+needed to operate a single pool with multiple XMPP servers, but more
+work is needed to federate the manager components. Through the use
+of a shared data store, such as Redis \cite{Redis}, a multi-manager
+installation can be easily achieved so long as only a single XMPP
+server is used since some implementations automatically load-balance
+components \cite{ejabberd}. Linking managers on different servers,
+in particular servers from different organizations, will require additions
+to Kestrel's protocol to create the equivalent of {}``flocking''
+between Condor systems. The current design under consideration is
+to use a distributed hash table (DHT) to spread workers amongst managers,
+and then allow managers to masquerade as a worker to other managers.
+The masquerading manager would advertise the union of its worker's
+capabilities, and would act as a task router, forwarding any received
+tasks to one of its workers that match the task.

@@ -30,7 +30,7 @@ Transfer Protocol} (SMTP). Each server maintains long-lived connections
 to many clients, and optionally connections to other XMPP servers. For
 the most popular server implementation, \texttt{ejabberd} \cite{ejabberd}
 \cite{XSF-Services}, accepting upwards of twenty-thousand clients on a regular
-basis is possible \cite{Jabber.ru}, particularly when implementation specific
+basis is possible \cite{JabberRu}, particularly when implementation specific
 clustering is used to spread server loads across multiple physical machines
 \cite{ejabberd-cluster}. Figure \ref{fig:Jabber.ru-Statistics} shows a snapshot
 of the daily usage of the the Russian Jabber.ru XMPP server, which processes
@@ -38,6 +38,25 @@ approximately fourteen thousand client connections at any given time. Other
 large XMPP installations, notably Google's GTalk \cite{GTalk} and Facebook's
 chat \cite{Facebook} services, are able to accept, through clustering, several
 million clients at once.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/xmpp_network}
+\label{fig:XMPP-Network}
+\caption{A demonstration of a basic XMPP network, including client agents,
+internal and external server components, and XMPP servers. Communications
+from entities associated with one server are not routed by any intermediary
+server. Messages sent from the client marked ``A'' to the client marked ``B''
+will always be sent from server labeled ``1'' to the server labeled ``2'',
+never along the path from ``1'' to ``3'' to ``2''.}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/jabber_ru_stats}
+\label{fig:Jabber.ru-Statistics}
+\caption{Daily usage graph from the Russian XMPP service provider Jabber.ru.
+Average use is around 22,000 simultaneous client connections during peek 
+daytime hours.}
+\end{figure}
 
 While many server implementations provide the ability to cluster, XMPP itself
 does not define a clustering mechanism. Instead, it provides a mechanism for
@@ -60,7 +79,7 @@ JIDs commonly look similar to e-mail addresses, but with an additional section:
 of the JID is the only required section. JIDs for servers consist solely
 of the domain name exposing the XMPP service (DNS service, or SRV, records
 can be used to allow a server to support a domain different from the domain
-of the machine on which it is running \cite{XMPP-DNS}). User accounts on a
+of the machine on which it is running \cite{RFC3920}). User accounts on a
 server are identified by the \texttt{<localpart>} section of the JID; when
 only the form \texttt{localpart@domainpart} is used, the result is called
 a \textit{bare JID}. When a client connects to a server using an account's
@@ -79,10 +98,10 @@ Within the network are four types of entities, or agents, which can be marked
 on a continuum of scalability. The first is the regular XMPP client; many
 implementations for clients exist, notably for use with instant messaging by a
 human. However, many client agents exist as automated programs, or \textit{bots}
-\cite{XMPP-Bots}, to provide services to other clients in the network. Each
+\cite{RFC3921}, to provide services to other clients in the network. Each
 client connection is associated with a unique full JID (server implementations
 are free to decide to reject duplicate full JIDs connections or terminate the
-existing connection in favor of the new one \cite{XMPP-JID-Conflict}). Under
+existing connection in favor of the new one \cite{RFC3920}). Under
 the XMPP Design Guidelines, clients are typically kept simple, offloading as
 much functionality as possible onto the server, making it easier for multiple
 implementations to work together \cite{XEP-0134}.
@@ -113,10 +132,10 @@ The first is that the optimization assumption of small rosters is violated,
 potentially impacting performance based on the storage mechanisms used. The
 second is that a client's roster is sent to the client in a single stanza as
 part of the initialization procedure of the XMPP session. Stanzas are not
-interruptable -- all other stream communications to the client are blocked while
-the roster is transmitted \cite{XMPP-Interruptable}. For rosters with several
+interruptible -- all other stream communications to the client are blocked while
+the roster is transmitted \cite{Moffitt2008a}. For rosters with several
 thousand entries, this places a severe penalty on start up times for agents and
-on the amount of networking traffic used \cite{XMPP-Component-Scaling}. For a
+on the amount of networking traffic used \cite{Moffitt2008}. For a
 component, no roster is maintained by the server, leaving that responsibility to
 the component itself.
 
@@ -142,10 +161,10 @@ and as such are referred to as stanzas instead. Each stanza is guaranteed to
 possess certain attributes, namely the attributes \texttt{to} and \texttt{from}
 which provide the JIDs identifying the sender and recipient of the stanza
 \cite{RFC3920}. In general, the \texttt{from} attribute of a stanza is set by
-the server in order to combat impersonation \cite{XMPP-Server-From}. While
+the server in order to combat impersonation \cite{RFC3920}. While
 there are several elements that may appear at the top-level of a stream element
 during the course of establishing the session, there are three main elements
-that are defined to bestanzas: \texttt{<message />}, \texttt{<presence />},
+that are defined to be stanzas: \texttt{<message />}, \texttt{<presence />},
 and \texttt{<iq />}. Each type of stanza differs in both routing and response
 behaviors.
 
@@ -155,7 +174,7 @@ behaviors.
 The most basic of the three stanza types, a \texttt{<message />} stanza is used
 to push data from one agent to another. While this is typically done in a ``fire
 and forget'' manner, some servers support more advanced message processing that
-can provide better guarantees of message delivery \cite{XMPP-AMP}. However, even
+can provide better guarantees of message delivery \cite{XEP-0079}. However, even
 with reliable delivery, there is no guaranteed response from a \texttt{<message
 />} stanza. The most common use for \texttt{<message />} stanzas is as an
 envelope for messages from a chat session between two agents. Other major uses
@@ -175,7 +194,7 @@ to the resource with the highest priority value. While it is possible to
 include additional information in a \texttt{<presence />} stanza, it is highly
 discouraged. Presence stanzas are typically the most frequently stanzas used
 within an XMPP network, and thus bandwidth usage must be considered and
-minimized \cite{XMPP-Presence}.
+minimized \cite{RFC3921}.
 
 Presence stanzas whose \texttt{type} attribute value is in one of
 \texttt{subscribe}, \texttt{subscribed}, \texttt{unsubscribe}, or
@@ -203,7 +222,7 @@ The final stanza is the \texttt{<iq />} stanza, which is short for
 ``Info/Query''. In contrast with \texttt{<message /} stanzas, \texttt{<iq
 />} stanzas are guaranteed to have a response, either from another agent, or
 the server itself. There are four types of \texttt{<iq /} stanzas, two for
-requests and two for responses. An intial \texttt{<iq />} request may possess a
+requests and two for responses. An initial \texttt{<iq />} request may possess a
 \texttt{type} value of either \texttt{get} or \texttt{set}. A \texttt{get} type
 is roughly equivalent to the HTTP \texttt{GET} method. These requests are meant
 to request some form of data from another agent, usually without other side
@@ -213,7 +232,7 @@ be saved or perform some side effect.
 
 When an \texttt{<iq />} is successfully processed, a response \texttt{<iq />}
 with a \texttt{type} value of \texttt{result} will be returned. A response
-with a \texttt{type} value of \texttt{error} indicates that an error occured
+with a \texttt{type} value of \texttt{error} indicates that an error occurred
 somewhere during the exchange, such as the intended recipient was not found or
 the recipient could not handle the request. It is possible to associate the
 initial \texttt{<iq />} stanza with its response by examining its \texttt{id}
@@ -223,17 +242,55 @@ value is used as the \texttt{id} value of a reply stanza.
 \section{Security Considerations}
 \label{sec:Security-Considerations}
 
+In order to provide basic security to XMPP communications between clients
+and servers, the Transport Layer Security (TLS) \cite{TLS} and Simple Authentication
+and Security Layer (SASL) \cite{SASL} must be used. The use of TLS provides
+channel encryption for the XML stream to prevent tampering and eavesdropping \cite{RFC3920}.
+While it is a requirement to support the use of TLS in both client and server 
+implementations, it is still possible for a server administrator to make its
+use optional. Client agents requiring a secure channel must negotiate the use
+of TLS using the STARTLS \cite{RFC3920} stream feature. The method of encryption
+used by TLS is commonly based on digital certificates, which must be validated
+by a client agent when presented to ensure a valid chain-of-trust for the
+server's certificate; this may be done either by explicitly comparing the presented
+certificate against a known, trusted version, or checking that the certificate
+has been issued by a trusted Certificate Authority (CA).
+
+While TLS prevents tampering, it does not guarantee the identity of the client
+initiating the communications. SASL provides several mechanisms for allowing
+a client to authenticate an identity. These mechanisms include:
+\begin{enumerate}
+\item PLAIN: The client's password is transmitted in base64 encoding, relying
+on the underlying stream's channel encryption for security.
+\item DIGEST-MD5: A more secure form of authentication whereby the client is
+challenged by the server to provide a hashed version of the user's password,
+along with the username, server name, security realm, etc \cite{RFC2831}. The
+main advantage is that the password itself is never transmitted.
+\item EXTERNAL: The SASL EXTERNAL mechanism allows for a client to authenticate
+itself using a digital certificate.
+\end{enumerate}
+
+While each connection between entities in the XMPP network may be encrypted,
+the core XMPP standards do not define a method for end-to-end encryption of
+data. Several methods for achieving end-to-end encryption have been proposed,
+but a consensus has not yet been reached. An older method is documented 
+in XEP-0027: Current Jabber OpenPGP Usage \cite{XEP-0027} whereby message or
+presence stanza contents may be encrypted using an OpenPGP key. Unfortunately,
+IQ stanza contents can not be encrypted in this manner. A newer proposal
+uses IQ stanzas to implement a secondary communications channel, whose contents
+is encrypted using TLS \cite{XMPP-E2E}.
+
 \section{XMPP Extension Proposals (XEPs)}
 \label{sec:XEPs}
 
 While the core XMPP specifications are maintained by the IETF, the XMPP
-Standards Foudation is responsible for maintaining additional extensions to
+Standards Foundation is responsible for maintaining additional extensions to
 the specifications and protocols, adding new features or documenting current
 best practices. Such extensions are referred to as XMPP Extension Proposals,
 or XEPs, each of which is assigned a four digit number starting from 0001.
 XEPs are grouped into several categories, including \textit{Draft Standard},
 \textit{Final Standard}, \textit{Experimental}, \textit{Deferred}, among
-others \cite{XMPP-XEP-States}. A XEP in the final standard state is considered
+others \cite{XEP-0001}. A XEP in the final standard state is considered
 finished, and will not be updated further. A draft standard XEP is considered
 stable and reliable for implementation, while an experimental XEP is encouraged
 for implementation but may still undergo significant revision. Several XEPs are

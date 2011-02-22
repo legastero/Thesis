@@ -1,20 +1,79 @@
 % This file was created with JabRef 2.6.
-% Encoding: Cp1252
+% Encoding: UTF8
 
-@ELECTRONIC{ejabberd2,
+@CONFERENCE{Abraham2010,
+  author = {Abraham, L. and Murphy, M.A. and Fenn, M. and Goasguen, S.},
+  title = {{Self-provisioned hybrid clouds}},
+  booktitle = {Proceeding of the 7th international conference on Autonomic computing},
+  year = {2010},
+  pages = {161--168},
+  organization = {ACM},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.11.10}
+}
+
+@CONFERENCE{Anderson2004,
+  author = {Anderson, D.P.},
+  title = {{BOINC: A system for public-resource computing and storage}},
+  booktitle = {proceedings of the 5th IEEE/ACM International Workshop on Grid Computing},
+  year = {2004},
+  pages = {4--10},
+  organization = {IEEE Computer Society},
+  __markedentry = {[lance]},
+  isbn = {0769522564},
+  owner = {sebgoa},
+  timestamp = {2010.10.31}
+}
+
+@ELECTRONIC{ejabberd-cluster,
   author = {badlop},
   month = {12},
   year = {2006},
   title = {Ejabberd},
-  url = {http://www.ejabberd.im/features},
+  howpublished = {\\\url{http://www.ejabberd.im/features}},
   owner = {Lance},
   timestamp = {2009.08.29}
+}
+
+@INPROCEEDINGS{Barham2003,
+  author = {Paul Barham and Boris Dragovic and Keir Fraser and Steven Hand and
+	Tim Harris and Alex Ho and Rolf Neugebauer and Ian Pratt and Andrew
+	Warfield},
+  title = {Xen and the Art of Virtualization},
+  booktitle = {Nineteenth ACM Symposium on Operating Systems Principles},
+  year = {2003},
+  __markedentry = {[lance]},
+  abstract = {Numerous systems have been designed which use virtualization to subdivide
+	the ample resources of a modern computer. Some require specialized
+	hardware, or cannot support commodity operating systems. Some target
+	100\% binary compatibility at the expense of performance. Others
+	sacrifice security or functionality for speed. Few offer resource
+	isolation or performance guarantees; most provide only best-effort
+	provisioning, risking denial of service.This paper presents Xen,
+	an x86 virtual machine monitor which allows multiple commodity operating
+	systems to share conventional hardware in a safe and resource managed
+	fashion, but without sacrificing either performance or functionality.
+	This is achieved by providing an idealized virtual machine abstraction
+	to which operating systems such as Linux, BSD and Windows XP, can
+	be ported with minimal effort.Our design is targeted at hosting up
+	to 100 virtual machine instances simultaneously on a modern server.
+	The virtualization approach taken by Xen is extremely efficient:
+	we allow operating systems such as Linux and Windows XP to be hosted
+	simultaneously for a negligible performance overhead --- at most
+	a few percent compared with the unvirtualized case. We considerably
+	outperform competing commercial and freely available solutions in
+	a range of microbenchmarks and system-wide tests.},
+  file = {Barham2003.pdf:Barham2003.pdf:PDF},
+  keywords = {Virtualization},
+  owner = {mamurph},
+  timestamp = {2009.02.23}
 }
 
 @ARTICLE{Beaumont2008,
   author = {Olivier Beaumont and Larry Carter and Jeanne Ferrante and Arnaud
 	Legrand and Loris Marchal and Yves Robert},
-  title = {Centralized versus Distributed Schedulers for Bag-of-Tasks Applications},
+  title = {{Centralized versus Distributed Schedulers for Bag-of-Tasks Applications}},
   journal = {IEEE Transactions on Parallel and Distributed Systems},
   year = {2008},
   volume = {19},
@@ -56,12 +115,35 @@
   timestamp = {2009.02.06}
 }
 
+@CONFERENCE{B'egin2008,
+  author = {B{\'e}gin, M.E.},
+  title = {{An EGEE comparative study: Grids and Clouds-evolution or revolution}},
+  booktitle = {23rd Open Grid Forum (OGF23)},
+  year = {2008},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.06.01}
+}
+
 @ELECTRONIC{Crockford,
   author = {Douglas Crockford},
-  title = {Introducing JSON},
-  url = {json.org},
+  title = {{Introducing JSON}},
+  howpublished = {\\\url{http://json.org}},
   owner = {Lance},
   timestamp = {2009.08.26}
+}
+
+@CONFERENCE{Deelman2004,
+  author = {Deelman, E. and Blythe, J. and Gil, Y. and Kesselman, C. and Mehta,
+	G. and Patil, S. and Su, M.H. and Vahi, K. and Livny, M.},
+  title = {{Pegasus: Mapping scientific workflows onto the grid}},
+  booktitle = {Grid Computing},
+  year = {2004},
+  pages = {131--140},
+  organization = {Springer},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.11.10}
 }
 
 @CONFERENCE{Deelman2009,
@@ -79,7 +161,7 @@
 
 @ARTICLE{DouglasThain2006,
   author = {Douglas Thain, Todd Tannenbaum, Miron Livny},
-  title = {How to Measure a Large Open Source Distributed System},
+  title = {{How to Measure a Large Open Source Distributed System}},
   journal = {Concurrency and Computation: Practice and Experience},
   year = {2006},
   volume = {8},
@@ -89,9 +171,32 @@
   timestamp = {2009.09.01}
 }
 
+@INPROCEEDINGS{Figueiredo2003,
+  author = {Renato J. Figueiredo and Peter A. Dinda and Jose A. B. Fortes},
+  title = {A Case For Grid Computing On Virtual Machines},
+  booktitle = {23rd International Conference on Distributed Computing Systems},
+  year = {2003},
+  __markedentry = {[lance]},
+  abstract = {We advocate a novel approach to grid computing thatis based on a combination
+	of "classic" operating system level virtual machines (VMs) and middleware
+	mechanisms to manage VMs in a distributed environment. The abstractionis
+	that of dynamically instantiated and mobile VMs thatare a combination
+	of traditional OS processes (the VM monitors) and files (the VM state).
+	We give qualitative arguments that justify our approach in terms
+	of security, isolation, customization, legacy support and resource
+	control,and we show quantitative results that demonstrate the feasibility
+	of our approach from a performance perspective. Finally, we describe
+	the middleware challenges implied by the approach and an architecture
+	for grid computing using virtual machines.},
+  file = {Figueiredo2003.pdf:Figueiredo2003.pdf:PDF},
+  keywords = {Virtualization},
+  owner = {mamurph},
+  timestamp = {2007.08.21}
+}
+
 @ARTICLE{Foster1997,
   author = {Ian Foster and Carl Kesselman},
-  title = {Globus: A Metacomputing Infrastructure Toolkit},
+  title = {{Globus: A Metacomputing Infrastructure Toolkit}},
   journal = {International Journal of Supercomputing Applications},
   year = {1997},
   volume = {11},
@@ -137,8 +242,8 @@
 
 @ELECTRONIC{SleekXMPP,
   author = {Nathan Fritz and Lance Stout},
-  title = {SleekXMPP},
-  url = {http://github.com/fritzy/SleekXMPP},
+  title = {Sleek{XMPP}},
+  howpublished = {\\\url{http://github.com/fritzy/SleekXMPP}},
   owner = {lstout},
   timestamp = {2009.09.02}
 }
@@ -165,6 +270,59 @@
   keywords = {Networking},
   owner = {mamurph},
   timestamp = {2009.03.04}
+}
+
+@INPROCEEDINGS{Ganguly2006a,
+  author = {Ganguly, A. and Agrawal, A. and Boykin, P. O. and Figueiredo, R.
+	},
+  title = {{WOW}: Self-Organizing Wide Area Overlay Networks of Virtual Workstations},
+  booktitle = {15th IEEE International Symposium on High Performance Distributed
+	Computing},
+  year = {2006},
+  __markedentry = {[lance]},
+  abstract = {This paper describes WOW, a distributed system that combines virtual
+	machine, overlay networking and peer-to-peer techniques to create
+	scalable wide-area networks of virtual workstations for high-throughput
+	computing. The system is architected to: facilitate the addition
+	of nodes to a pool of resources through the use of system virtual
+	machines (VMs) and self-organizing virtual network links; to maintain
+	IP connectivity even if VMs migrate across network domains; and to
+	present to end-users and applications an environment that is functionally
+	identical to a local-area network or cluster of workstations. We
+	describe a novel, extensible user-level decentralized technique to
+	discover, establish and maintain overlay links to tunnel IP packets
+	over different transports (including UDP and TCP) and across firewalls.
+	We also report on several experiments conducted on a testbed WOW
+	deployment with 118 P2P router nodes over PlanetLab and 33 VMware-based
+	VM nodes distributed across six firewalled domains. Experiments show
+	that the latency in joining a WOW network is of the order of seconds:
+	in a set of 300 trials, 90% of the nodes self-configured P2P routes
+	within 10 seconds, and more than 99% established direct connections
+	to other nodes within 200 seconds. Experiments also show that the
+	testbed delivers good performance for two unmodified, representative
+	benchmarks drawn from the life-sciences domain. The testbed WOW achieves
+	an overall throughput of 53 jobs/minute for PBS-scheduled executions
+	of the MEME application (with average single-job sequential running
+	time of 24.1s) and a parallel speedup of 13.5 for the PVM-based fastDNAml
+	application. Experiments also demonstrate that the system is capable
+	of seamlessly maintaining connectivity at the virtual IP layer for
+	typical client/server applications (NFS, SSH, PBS) when VMs migrate
+	across a WAN},
+  doi = {10.1109/HPDC.2006.1652133},
+  file = {Ganguly2006a.pdf:Ganguly2006a.pdf:PDF},
+  issn = {1082-8907},
+  keywords = {Networking},
+  owner = {mamurph},
+  timestamp = {2009.03.04}
+}
+
+@ELECTRONIC{SQLite,
+  author = {D. Richard Hipp},
+  title = {{SQL}ite},
+  howpublished = {\\\url{http://www.sqlite.org/}},
+  organization = {Hwaci - Applied Software Research},
+  owner = {lance},
+  timestamp = {2011.02.21}
 }
 
 @CONFERENCE{Hoffa2009,
@@ -218,7 +376,7 @@
 
 @INPROCEEDINGS{Hui2008,
   author = {Li Hui and Huashan Yu and Li Xiaoming},
-  title = {A lightweight execution framework for massive independent tasks},
+  title = {{A lightweight execution framework for massive independent tasks}},
   booktitle = {Many-Task Computing on Grids and Supercomputers, 2008. MTAGS 2008.
 	Workshop on},
   year = {2008},
@@ -234,25 +392,49 @@
   timestamp = {2009.08.31}
 }
 
-@ELECTRONIC{XEP-0030,
-  author = {Joe Hildebrand, Peter Millard, Ryan Eatmon and Peter Saint-Andre},
-  title = {XEP-0030: Service Discovery},
-  url = {http://xmpp.org/extensions/xep-0030.html},
+@ELECTRONIC{XEP-0001,
+  author = {Peter Saint-Andre},
+  title = {{XEP-0001: XMPP Extension Protocols}},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0001.html}},
   owner = {lstout},
   timestamp = {2010.09.13}
 }
 
+@ELECTRONIC{XEP-0030,
+  author = {Joe Hildebrand, Peter Millard, Ryan Eatmon and Peter Saint-Andre},
+  title = {{XEP-0030: Service Discovery}},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0030.html}},
+  owner = {lstout},
+  timestamp = {2010.09.13}
+}
+
+@ELECTRONIC{XEP-0079,
+  author = {Matthew Millard and Peter Saint-Andre},
+  title = {{XEP-0079: Advanced Message Processing}},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0079.html}},
+  owner = {lstout},
+  timestamp = {2010.09.13}
+}
+
+
+@ELECTRONIC{XEP-0027,
+  author = {Thomas Muldowney},
+  title = {{XEP-0027: Current Jabber OpenPGP Usage}},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0027.html}},
+  owner = {lstout},
+  timestamp = {2010.09.13}
+}
 @ELECTRONIC{XEP-0115,
   author = {Joe Hildebrand, Peter Saint-Andre, Remko Tron\con and Jacek Konieczny},
-  title = {XEP-0115: Entity Capabilities},
-  url = {http://xmpp.org/extensions/xep-0115.html},
+  title = {{XEP-0115: Entity Capabilities}},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0115.html}},
   owner = {lstout},
   timestamp = {2010.09.13}
 }
 
 @INPROCEEDINGS{Keahey2008,
   author = {Keahey, K. and Freeman, T.},
-  title = {Contextualization: Providing One-Click Virtual Clusters},
+  title = {{Contextualization: Providing One-Click Virtual Clusters}},
   booktitle = {4th IEEE International Conference on e-Science},
   year = {2008},
   address = {Indianapolis, IN},
@@ -286,6 +468,39 @@
 	terminology, and outlines the services provided by the system. The
 	goal is to provide a common vocabulary for further work on requirements
 	for protocols and markup for presence and instant messaging.},
+  owner = {lance},
+  publisher = {{IETF}},
+  timestamp = {2011.01.23}
+}
+
+@ELECTRONIC{RFC2831,
+  author = {{P.}~Leach and {C.}~Newman},
+  month = {May},
+  year = {2000},
+  title = {{Using Digest Authentication as a SASL Mechanism}},
+  howpublished = {\\\url{http://www.ietf.org/rfc/rfc3831.txt}},
+  owner = {lance},
+  publisher = {{IETF}},
+  timestamp = {2011.01.23}
+}
+
+@ELECTRONIC{TLS,
+  author = {{T.}~Dierks and {E.}~Rescorla},
+  month = {August},
+  year = {2008},
+  title = {{The Transport Layer Security (TLS) Protocol Version 1.2}},
+  howpublished = {\\\url{http://www.ietf.org/rfc/rfc5246.txt}},
+  owner = {lance},
+  publisher = {{IETF}},
+  timestamp = {2011.01.23}
+}
+
+@ELECTRONIC{SASL,
+  author = {{A.}~Melnikov and {K.}~Zeilenga},
+  month = {June},
+  year = {2006},
+  title = {{Simple Authentication and Security Layer (SASL)}},
+  howpublished = {\\\url{http://www.ietf.org/rfc/rfc4422.txt}},
   owner = {lance},
   publisher = {{IETF}},
   timestamp = {2011.01.23}
@@ -358,9 +573,9 @@
   author = {Matthew Miller},
   month = {June},
   year = {2005},
-  title = {XEP-0050: Ad-Hoc Commands},
-  organization = {XMPP Standards Foundation},
-  url = {http://xmpp.org/extensions/xep-0050.html},
+  title = {{XEP-0050: Ad-Hoc Commands}},
+  organization = {{XMPP Standards Foundation}},
+  howpublihsed = {\\\url{http://xmpp.org/extensions/xep-0050.html}},
   owner = {lstout},
   timestamp = {2009.09.01}
 }
@@ -369,8 +584,18 @@
   author = {Jack Moffitt},
   month = {August},
   year = {2008},
-  title = {Thoughts On Scalable XMPP Bots},
-  url = {http://metajack.im/2008/08/04/thoughts-on-scalable-xmpp-bots/},
+  title = {{Thoughts On Scalable XMPP Bots}},
+  howpublished = {\\\url{http://metajack.im/2008/08/04/thoughts-on-scalable-xmpp-bots/}},
+  owner = {Lance},
+  timestamp = {2009.08.26}
+}
+
+@ELECTRONIC{Moffitt2008a,
+  author = {Jack Moffitt},
+  month = {June},
+  year = {2008},
+  title = {{Binary Data is XMPP's Achilles Heel}},
+  howpublished = {\\\url{http://metajack.im/2008/06/10/binary-data-is-xmpps-achilles-heel}},
   owner = {Lance},
   timestamp = {2009.08.26}
 }
@@ -391,7 +616,7 @@
 @ARTICLE{Murphy2010,
   author = {Michael A. Murphy and Linton Abraham and Michael Fenn and Sebastien
 	Goasguen},
-  title = {Autonomic Clouds on the Grid},
+  title = {{Autonomic Clouds on the Grid}},
   journal = {Journal of Grid Computing},
   year = {2010},
   volume = {8},
@@ -453,7 +678,7 @@
 @INPROCEEDINGS{Murphy2009a,
   author = {Michael A. Murphy and Brandon Kagey and Michael Fenn and Sebastien
 	Goasguen},
-  title = {Dynamic Provisioning of {V}irtual {O}rganization {C}lusters},
+  title = {{Dynamic Provisioning of Virtual Organization Clusters}},
   booktitle = {9th IEEE International Symposium on Cluster Computing and the Grid
 	({CCGrid} '09)},
   year = {2009},
@@ -487,7 +712,7 @@
   timestamp = {2009.02.13}
 }
 
-@ARTICLE{PBS,
+@ARTICLE{Nitzberg2004,
   author = {Nitzberg, Bill and Schopf, Jennifer M. and Jones, James Patton},
   title = {PBS Pro: Grid computing and scheduling attributes},
   year = {2004},
@@ -495,7 +720,34 @@
   address = {Norwell, MA, USA},
   book = {Grid resource management: state of the art and future trends},
   isbn = {1-4020-7575-8},
+  owner = {lance},
+  publisher = {Kluwer Academic Publishers},
+  timestamp = {2011.02.21}
+}
+
+@ARTICLE{PBS,
+  author = {Nitzberg, Bill and Schopf, Jennifer M. and Jones, James Patton},
+  title = {{PBS Pro: Grid computing and scheduling attributes}},
+  year = {2004},
+  pages = {183--190},
+  address = {Norwell, MA, USA},
+  book = {Grid resource management: state of the art and future trends},
+  isbn = {1-4020-7575-8},
   publisher = {Kluwer Academic Publishers}
+}
+
+@CONFERENCE{Nurmi2009,
+  author = {Nurmi, D. and Wolski, R. and Grzegorczyk, C. and Obertelli, G. and
+	Soman, S. and Youseff, L. and Zagorodnov, D.},
+  title = {{The eucalyptus open-source cloud-computing system}},
+  booktitle = {Proceedings of the 2009 9th IEEE/ACM International Symposium on Cluster
+	Computing and the Grid-Volume 00},
+  year = {2009},
+  pages = {124--131},
+  organization = {IEEE Computer Society},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.07.05}
 }
 
 @ARTICLE{Oinn2004,
@@ -513,7 +765,7 @@
 
 @INPROCEEDINGS{PWang2003,
   author = {P Wang, S Sparks, C Zou},
-  title = {An Advanced Hybrid Peer-to-Peer Botnet},
+  title = {{An Advanced Hybrid Peer-to-Peer Botnet}},
   booktitle = {Dependable and Secure Computing, IEEE Transactions on : Accepted
 	for future publication},
   year = {2003},
@@ -524,7 +776,7 @@
 
 @INPROCEEDINGS{Raicu2008,
   author = {Raicu, I. and Foster, I.T. and Yong Zhao},
-  title = {Many-task computing for grids and supercomputers},
+  title = {{Many-task computing for grids and supercomputers}},
   booktitle = {Many-Task Computing on Grids and Supercomputers, 2008. MTAGS 2008.
 	Workshop on},
   year = {2008},
@@ -537,9 +789,23 @@
 	supercomputers}
 }
 
+@CONFERENCE{Raicu2007,
+  author = {Raicu, I. and Zhao, Y. and Dumitrescu, C. and Foster, I. and Wilde,
+	M.},
+  title = {{Falkon: a Fast and Light-weight tasK executiON framework}},
+  booktitle = {Supercomputing, 2007. SC'07. Proceedings of the 2007 ACM/IEEE Conference
+	on},
+  year = {2007},
+  pages = {1--12},
+  organization = {IEEE},
+  __markedentry = {[sebgoa][lance]},
+  owner = {sebgoa},
+  timestamp = {2010.11.10}
+}
+
 @ARTICLE{Ruth2005,
   author = {Paul Ruth and Xuxian Jiang and Dongyan Xu and Sebastien Goasguen},
-  title = {Virtual Distributed Environments in a Shared Infrastructure},
+  title = {{Virtual Distributed Environments in a Shared Infrastructure}},
   journal = {Computer},
   year = {2005},
   volume = {38},
@@ -562,7 +828,7 @@
 @ELECTRONIC{XEP-0134,
   author = {Peter Saint-Andre},
   title = {{XEP-0134: XMPP Design Guidelines}},
-  url = {http://xmpp.org/extensions/xep-0134.html},
+  howpublished = {\\\url{http://xmpp.org/extensions/xep-0134.html}},
   owner = {lstout},
   timestamp = {2010.09.13}
 }
@@ -572,8 +838,8 @@
   month = {October},
   year = {2004},
   title = {{Extensible Messaging and Presence Protocol (XMPP): Core}},
+  howpublished = {\\\url{http://www.ietf.org/rfc/rfc3920.txt}},
   organization = {IETF},
-  url = {http://www.ietf.org/rfc/rfc3920.txt},
   abstract = {This memo defines the core features of the Extensible Messaging and
 	
 	 Presence Protocol (XMPP), a protocol for streaming Extensible Markup
@@ -597,8 +863,8 @@
   year = {2004},
   title = {{Extensible Messaging and Presence Protocol (XMPP): Instant Messaging
 	and Presence}},
+  howpublished = {\\\url{http://www.ietf.org/rfc/rfc3921.txt}},
   organization = {IETF},
-  url = {http://www.ietf.org/rfc/rfc3921.txt},
   abstract = {This memo describes extensions to and applications of the core
 	
 	 features of the Extensible Messaging and Presence Protocol (XMPP)
@@ -613,14 +879,37 @@
 @ELECTRONIC{Redis,
   author = {Salvatore Sanfilippo},
   title = {Redis},
-  url = {http://code.google.com/p/redis/},
+  howpublished = {\\\url{http://redis.io}},
   owner = {lance},
-  timestamp = {2010.11.08}
+  timestamp = {2011.02.21}
+}
+
+@CONFERENCE{Schmidt2010,
+  author = {Schmidt, M. and Fallenbeck, N. and Smith, M. and Freisleben, B.},
+  title = {{Efficient Distribution of Virtual Machines for Cloud Computing}},
+  booktitle = {2010 18th Euromicro Conference on Parallel, Distributed and Network-based
+	Processing},
+  year = {2010},
+  pages = {567--574},
+  organization = {IEEE},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.09.03}
+}
+
+@INPROCEEDINGS{Schwickerath2010,
+  author = {Ulrich Schwickerath and Sebastien Goasguen},
+  title = {CERN Cloud Computing Infrastructure},
+  booktitle = {2nd Cloud Computing International Conference},
+  year = {2010},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  timestamp = {2010.09.05}
 }
 
 @CONFERENCE{Sfiligoi2008,
   author = {Sfiligoi, I.},
-  title = {{glideinWMSâ??a generic pilot-based workload management system}},
+  title = {{glideinWMS - a generic pilot-based workload management system}},
   booktitle = {Journal of Physics: Conference Series},
   year = {2008},
   volume = {119},
@@ -630,11 +919,33 @@
   timestamp = {2010.11.07}
 }
 
+@ELECTRONIC{MicroCoreLinux,
+  author = {Robert Shingledecker},
+  title = {{Micro Core Linux}},
+  howpublished = {\\\url{http://www.tinycorelinux.com/}},
+  owner = {lance},
+  timestamp = {2011.02.21}
+}
+
+@ARTICLE{Sotomayor2009,
+  author = {Sotomayor, B. and Montero, R.S. and Llorente, I.M. and Foster, I.},
+  title = {{Virtual infrastructure management in private and hybrid clouds}},
+  journal = {IEEE Internet Computing},
+  year = {2009},
+  volume = {13},
+  pages = {14--22},
+  number = {5},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  publisher = {IEEE Educational Activities Department},
+  timestamp = {2010.06.01}
+}
+
 @INPROCEEDINGS{Stout10,
   author = {Stout, Lance and Fenn, Michael and Murphy, Michael A. and Goasguen,
 	Sebastien},
-  title = {Scaling virtual organization clusters over a wide area network using
-	the Kestrel workload management system},
+  title = {{Scaling virtual organization clusters over a wide area network using
+	the Kestrel workload management system}},
   booktitle = {Proceedings of the 19th ACM International Symposium on High Performance
 	Distributed Computing},
   year = {2010},
@@ -653,7 +964,7 @@
 
 @INPROCEEDINGS{Stout2009,
   author = {Stout, Lance and Murphy, Michael A. and Goasguen, Sebastien},
-  title = {Kestrel: an XMPP-based framework for many task computing applications},
+  title = {{Kestrel: an XMPP-based framework for many task computing applications}},
   booktitle = {MTAGS '09: Proceedings of the 2nd Workshop on Many-Task Computing
 	on Grids and Supercomputers},
   year = {2009},
@@ -680,6 +991,31 @@
   keywords = {Middleware},
   owner = {mamurph},
   timestamp = {2008.11.18}
+}
+
+@INPROCEEDINGS{Tsaregorodtsev2004,
+  author = {Andrei Tsaregorodtsev and Vincent Garonne and Ian Stokes-Rees},
+  title = {{DIRAC: A Scalable Lightweight Architecture for High Throughput Computing}},
+  booktitle = {Fifth IEEE/ACM International Workshop on Grid Computing (GRID '04)},
+  year = {2004},
+  address = {Pittsburgh, PA},
+  month = {November},
+  __markedentry = {[lance]},
+  abstract = {DIRAC (Distributed Infrastructure with Remote Agent Control) has been
+	developed by the CERN LHCb physics experiment to facilitate large
+	scale simulation and user analysis tasks spread across both grid
+	and non-grid computing resources. It consists of a small set of distributed
+	stateless Core Services, which are centrally managed, and Agents
+	which are managed by each computing site. DIRAC utilizes concepts
+	from existing distributed computing models to provide a lightweight,
+	robust, and flexible system. This paper will discuss the architecture,
+	performance, and implementation of the DIRAC system which has recently
+	been used for an intensive physics simulation involving more than
+	forty sites, 90 TB of data, and in excess of one thousand 1 GHz processor-years.},
+  file = {Tsaregorodtsev2004.pdf:Tsaregorodtsev2004.pdf:PDF},
+  keywords = {Pilot},
+  owner = {mike},
+  timestamp = {2009.10.12}
 }
 
 @INPROCEEDINGS{Tsugawa2006,
@@ -709,6 +1045,21 @@
   timestamp = {2009.03.04}
 }
 
+@ARTICLE{Vaquero2008,
+  author = {Vaquero, L.M. and Rodero-Merino, L. and Caceres, J. and Lindner,
+	M.},
+  title = {{A break in the clouds: towards a cloud definition}},
+  journal = {ACM SIGCOMM Computer Communication Review},
+  year = {2008},
+  volume = {39},
+  pages = {50--55},
+  number = {1},
+  __markedentry = {[lance]},
+  owner = {sebgoa},
+  publisher = {ACM},
+  timestamp = {2010.06.01}
+}
+
 @ARTICLE{Wagener2009,
   author = {Wagener, J. and Spjuth, O. and Willighagen, E.L. and Wikberg, J.E.S.},
   title = {{XMPP for cloud computing in bioinformatics supporting discovery
@@ -727,8 +1078,8 @@
 
 @INPROCEEDINGS{Weis2009,
   author = {Weis, G. and Lewis, A.},
-  title = {Using XMPP for ad-hoc grid computing - an application example using
-	parallel ant colony optimisation},
+  title = {{Using XMPP for ad-hoc grid computing - an application example using
+	parallel ant colony optimisation}},
   booktitle = {Parallel \& Distributed Processing, 2009. IPDPS 2009. IEEE International
 	Symposium on},
   year = {2009},
@@ -758,20 +1109,49 @@
   timestamp = {2010.11.07}
 }
 
+@INPROCEEDINGS{Wolinsky2006,
+  author = {David Wolinsky and Abhishek Agrawal and P. Oscar Boykin and Justin
+	Davis and Arijit Ganguly and Vladimir Paramygin and Peter Sheng and
+	Renato Figueiredo},
+  title = {On the Design of Virtual Machine Sandboxes for Distributed Computing
+	in {W}ide-area {O}verlays of Virtual {W}orkstations},
+  booktitle = {First International Workshop on Virtualization Technology in Distributed
+	Computing},
+  year = {2006},
+  __markedentry = {[lance]},
+  abstract = {With recent advances in virtual computing and the revelation that
+	compute-intensive tasks run well on system virtual machines (VMs),
+	the ability to develop, deploy, and manage distributed systems has
+	been ameliorated. This paper explores the design space of VM-based
+	sandboxes where the following techniques that facilitate the deployment
+	of secure nodes in Wide-area Overlays of virtual Workstations (WOWs)
+	are employed: DHCP-based virtual IP address allocation, self-configuring
+	virtual networks supporting peer-to-peer NAT traversal, stacked file
+	systems, and IPsec-based host authentication and end-to-end encryption
+	of communication channels. Experiments with implementations of single-image
+	VM sandboxes, which incorporate the above features and are easily
+	deployable on hosted I/O VMMs, show execution time overheads of 10.6%
+	or less for a batch-oriented CPU-intensive benchmark.},
+  file = {Wolinsky2006.pdf:Wolinsky2006.pdf:PDF},
+  keywords = {Networking},
+  owner = {mamurph},
+  timestamp = {2007.09.12}
+}
+
 @ELECTRONIC{DoDXMPP,
   author = {Rutrell Yasin},
   month = {June},
   year = {2010},
-  title = {DOD wants instant messaging tools to speak the same language},
+  title = {{DOD wants instant messaging tools to speak the same language}},
+  howpublished = {\\\url{http://defensesystems.com/articles/2010/06/23/dod-instant-messaging-test.aspx}},
   organization = {Defense Systems},
-  url = {http://defensesystems.com/articles/2010/06/23/dod-instant-messaging-test.aspx},
   owner = {lance},
   timestamp = {2010.11.10}
 }
 
 @ELECTRONIC{Adium,
   title = {Adium},
-  url = {http://www.adium.im},
+  howpublished = {\\\url{http://www.adium.im}},
   owner = {lstout},
   timestamp = {2009.09.01}
 }
@@ -785,20 +1165,26 @@
   timestamp = {2011.01.23}
 }
 
-@ELECTRONIC{ejabberd1,
+@ELECTRONIC{ejabberd,
   title = {Ejabberd},
+  howpublished = {\\\url{http://www.process-one.net/en/ejabberd/}},
   organization = {Process One},
-  url = {http://www.process-one.net/en/ejabberd/},
   owner = {lstout},
   timestamp = {2009.09.02}
 }
 
-@ELECTRONIC{GoogleTalk,
-  title = {About Google Talk},
-  organization = {Google},
-  url = {http://www.google.com/talk/about.html},
+@ELECTRONIC{GTalk,
+  title = {{Google Talk}},
+  howpublished = {\\\url{http://www.google.com/talk}},
   owner = {lstout},
-  timestamp = {2010.03.01}
+  timestamp = {2009.09.01}
+}
+
+@ELECTRONIC{JabberRu,
+  title = {{Jabber.Ru | The biggest Russian-node instant messaging network.}},
+  howpublished = {{\\\url{http://www.jabber.ru}}},
+  owner = {lance},
+  timestamp = {2011.02.21}
 }
 
 @ELECTRONIC{MSN,
@@ -810,56 +1196,106 @@
 }
 
 @ELECTRONIC{Openfire,
-  title = {Ignite Realtime: Openfire Server},
+  title = {{Ignite Realtime: Openfire Server}},
+  howpublished = {\\\url{http://www.igniterealtime.org/projects/openfire/}},
   organization = {Jive Software},
-  url = {http://www.igniterealtime.org/projects/openfire/},
   owner = {lstout},
   timestamp = {2010.03.01}
 }
 
 @ELECTRONIC{Pidgin,
-  title = {Pidgin, the universal chat client},
-  url = {http://www.pidgin.im},
+  title = {{Pidgin, the universal chat client}},
+  howpublished = {\\\url{http://www.pidgin.im}},
   owner = {lstout},
   timestamp = {2009.09.01}
 }
 
 @ELECTRONIC{Python,
-  title = {Python Programming Language},
+  title = {{Python Programming Language}},
+  howpublished = {\\\url{http://www.python.org}},
   organization = {Python Software Foundation},
-  url = {http://www.python.org},
   owner = {lstout},
   timestamp = {2009.09.02}
 }
 
 @ELECTRONIC{STAR,
-  title = {The STAR experiment},
-  url = {http://www.star.bnl.gov/},
+  title = {The {STAR} experiment},
+  howpublished = {\\\url{http://www.star.bnl.gov/}},
   owner = {lstout},
   timestamp = {2010.09.13}
 }
 
 @ELECTRONIC{Tigase,
-  title = {tigase.org | Open Source and Free (GPLv3) Jabber/XMPP Server},
-  url = {http://www.tigase.org/},
+  title = {{tigase.org | Open Source and Free (GPLv3) Jabber/XMPP Server}},
+  howpublished = {\\\url{http://www.tigase.org/}},
   owner = {lstout},
   timestamp = {2010.03.01}
 }
 
 @ELECTRONIC{XSF,
-  title = {XMPP Standards Foundation},
-  url = {http://xmpp.org},
+  title = {{XMPP Standards Foundation}},
+  howpublished = {\\\url{http://xmpp.org}},
   owner = {lstout},
   timestamp = {2010.09.13}
 }
 
+@ELECTRONIC{XSF-History,
+  title = {{History - The XMPP Standards Foundation}},
+  howpublished = {\\\url{http://xmpp.org/about-xmpp/history}},
+  owner = {lstout},
+  timestamp = {2010.09.13}
+}
+
+@ELECTRONIC{XSF-Services,
+  title = {{Public XMPP Services}},
+  howpublished = {\\\url{http://xmpp.org/services}},
+  year = {2009},
+  month = {December},
+  owner = {lstout},
+  timestamp = {2010.09.13}
+}
+
+
 @ELECTRONIC{Flocking,
   month = {August},
   year = {2009},
-  title = {5.2 Connecting Condor Pools with Flocking},
+  title = {{5.2 Connecting Condor Pools with Flocking}},
+  howpublished = {\\\url{http://www.cs.wisc.edu/condor/manual/v7.3/5\_2Connecting\_Condor.html}},
   organization = {University of Wisconsin-Madison},
-  url = {http://www.cs.wisc.edu/condor/manual/v7.3/5\_2Connecting\_Condor.html},
   owner = {lstout},
   timestamp = {2009.09.01}
+}
+
+@ELECTRONIC{XMPP-E2E,
+    author = {{D}.~Meyer and {P}.~Saint-Andre},
+    title = {{XTLS: End-to-End Encryption for the Extensible Messaging and Presence Protocol
+        (XMPP) Using Transport Layer Security (TLS)}},
+    month = {June},
+    year = {2009},
+    orangization = {IETF},
+    howpublished = {\\\url{http://tools.ietf.org/html/draft-meyer-xmpp-e2e-encryption-02}}
+}
+
+@ELECTRONIC{SQLAlchemy,
+    title = {{SQLAlchemy - The Database Toolkit for Python}},
+    howpublished = {\\\url{http://www.sqlalchemy.org}}
+}
+
+@ELECTRONIC{EC2,
+    title = {{Amazon Elastic Compute Cloud (Amazon EC2)}},
+    howpublished = {\\\url{http://aws.amazon.com/ec2}},
+    organization = {Amazon}
+}
+
+@ELECTRONIC{Yahoo,
+    title = {{Yahoo! Messenger - Chat, Instant message, SMS, Video Call, PC Calls}},
+    howpublished = {\\\url{http://messenger.yahoo.com}},
+    organization = {Yahoo!}
+}
+
+@ELECTRONIC{Facebook,
+    title = {{Facebook Chat}},
+    howpublished = {\\\url{http://www.facebook.com/sitetour/chat.php}},
+    organization = {Facebook}
 }
 

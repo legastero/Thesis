@@ -8,3 +8,5 @@
 *.out
 *.pdf
 *.toc
+*.bak
+*.swp

@@ -1,2 +1,188 @@
 \chapter{Introduction}
-Hi!
+\label{chap:Introduction}
+
+Cloud computing has sprung as a new paradigm for both enterprise and 
+scientific application development and deployment. However, the term ``cloud
+computing'' remains vague and broad in application, with considerations 
+by Foster \cite{Foster2009} and Vaquero \cite{Vaquero2008} notwithstanding,
+making it difficult to agree on a single, specific definition. Therefore, for
+the purposes of this work, the term ``cloud computing'' will be deemed to
+refer to the on-demand allocation of virtualized resources over a wide area
+network. Within this model, a cloud is established through instantiating 
+virtual machines from one or more virtualization enabled grid sites, or other
+cloud providers, such as Amazon's EC2 service \cite{EC2}.
+
+Such an infrastructure provides several benefits for scientific computing users.
+Since the computational work will be done on a virtual machine instead of a
+physical machine, users are able to package their own environment suitable for
+the desired application by preparing a VM image based on a standard worker node
+VM and customizing it with the all of the required supporting libraries and
+programs needed for their application, independent of the available library
+support of the physical host machines. By tailoring VMs to applications, it
+is not as necessary for a job scheduler to perform complex matching between
+jobs and the capabilities of worker agents, as performed through the ClassAd
+match-making approach used by Condor \cite{Tannenbaum2001}; each job may simply
+be tagged with the name of the VM configuration created for the specific
+application. In addition VMs provide better application encapsulation compared
+to regular operating system and cluster scheduling. Such encapsulation permits
+improved resource utilization via consolidation mechanisms and improved security
+by isolating user's applications from each other \cite{Figueiredo2003}. From
+the resource owner's point of view, virtualized resources also enable greater
+flexibility in the system administration because multiple operating systems can
+be offered at the same time.
+
+\section{Virtual Organization Clusters}
+Such an arrangement for the use of the term ``cloud'' corresponds to the Virtual
+Organization Cluster (VOC) model \cite{Murphy2009, Murphy2009a,Murphy2010},
+which enables the creation of virtual cluster environments that are compatible
+across sites, transparent to end users, implementable in both phased and
+non-disruptive manners, optionally customizable by Virtual Organizations
+(VOs), and designed according an an architectural specification. To establish
+a VOC, a Virtual Organization (VO) starts virtual machines over a wide area
+network through multiple providers, then a network overlay is created amongst
+the VM instances. Since the virtual machines used in the VOC can be spawned
+from a single image, VOC environments are nominally homogeneous across grid
+sites. The providers used for the virtual machines may include existing grid
+sites with virtualization capabilities and corporate cloud providers. It
+has been demonstrated that a VOC can be created using resources provided
+simultaneously by an Open Science Grid (OSG) site, Amazon EC2 instances, and
+CERN resources \cite{Stout10}. 
+
+The VOC provides elasticity in its capabilities
+by automatically growing or shrinking the number of provisioned VMs in the
+cluster based on the state and length of the job queues, allowing the VOC to
+operate transparently to the end user without explicit resource reservation
+requests; the transparency also applies to both the VO deploying the VOC and
+other entities which choose not to use VOCs, which enables the addition of VOC
+implementations to existing production grid sites without disruption of current
+operational infrastructure. 
+
+The method by which the VOC is able to autonomically
+provision itself to adapt to changing workload demands is through the use of
+pilot jobs which obtain the physical resources required from other grid sites
+or cloud providers. A pilot job starts a virtual machine, which may then be
+dynamically configured, or ``contextualized'' \cite{Keahey2008}, at boot time.
+The new VM once operational may then contact a dedicated server provided by
+the VO to locate the VOC and join the cluster and its overlay network. The
+mechanisms for creating the overlay network for spanning sites over a wide area
+network vary by implementation, but include IPOP \cite{Ganguly2006}, Violin
+\cite{Ruth2005} and ViNe \cite{Tsugawa2006}.
+
+However, the VOC must still rely either on the ability of the VM resources to
+lease scheduling mechanisms from the physical site or on the use of virtual
+networks which enable the VO to run its own standard job scheduler. Dedicated
+grid interconnection middleware such as Globus \cite{Foster1997} can be used
+to permit a VOC to join a grid as a site dedicated to the use of a single
+VO; other methods include direct submission mechanisms allowing VO members
+to submit workloads to the VOC without the use of grid middleware. While a 
+general purpose scheduler such as Condor \cite{Tannenbaum2001} may be used for
+this purpose, if the jobs to be executed by the virtual cluster do not require
+simultaneous interprocess communications, such as bag-of-tasks applications
+\cite{Beaumont2008}, then a scheduling system which can operate directly over
+a wide area network, such as the Kestrel system described herein, can be deployed
+without the need for a traditional, general purpose overlay network. For the
+purpose of this work, the cases where virtual networks are not used or cannot
+be used due to policy constraints by grid administrators and where a scheduler
+provided by the VO requires access to all VM resources regardless of the network
+characteristics are considered. 
+
+\section{Job Scheduling and Distribution in Clouds}
+While a significant body of work has been done in operating system
+virtualization \cite{Barham2003}, virtual networks \cite{Tsugawa2006,Ganguly2006}
+and provisioning of virtual machines \cite{Keahey2008,Sotomayor2009,Nurmi2009},
+little has been done on job scheduling in Cloud overlays, often assuming
+that existing scientific computing job schedulers could be used in
+these environments. Clouds built over wide area networks offer great
+technical challenges:
+\begin{itemize}
+\item Cloud providers and grid sites need to trust each other as well as
+the image producers in order to instantiate the same images \cite{B'egin2008}.
+\item Virtual machine images need to be transfered to all sites involved
+as well as made available on all physical nodes through either staging
+of shared file systems \cite{Schmidt2010}.
+\item Networking of the virtual machine instances need to enable network
+agnostic job scheduling.
+\item Users need to be taught a new access mechanism or use existing tools
+that have been adapted for Clouds.
+\end{itemize}
+While existing tools \cite{Tannenbaum2001,Deelman2009,Oinn2004,Wilde2009}
+can certainly evolve to be utilized in Clouds, this paper presents
+a new job scheduling framework specific to cloud computing thanks
+to its network agnostic feature. Named Kestrel \cite{Stout2009,Stout10},
+this framework is built using the XMPP protocol, a robust standard
+for messaging used in large scale instant messaging deployments, and
+recently adopted as the only approved instant messaging protocol for
+the Department of Defense \cite{DoDXMPP}. The assumptions and design
+principles made to create Kestrel were that traditional push models
+used in job scheduling did not meet the requirements of the users
+who developed their own job overlays on top of the traditional grid
+scheduling framework. Instead users developed their own pull model
+akin to the BOINC \cite{Anderson2004} middleware and solely used
+the grid scheduling to probe remote providers and request resources.
+This probing and request mechanism is very similar to the use of a
+cloud IaaS API. Examples of such pull based model also known as pilot
+job frameworks are PANDA \cite{Maeno2008}, DIRAC \cite{Tsaregorodtsev2004}
+and GlideinWMS \cite{Sfiligoi2008}. In addition, virtual networks
+will become extremely difficult to create due to the shortage of IPv4
+addresses and the slow adoption of IPv6. This means that increasingly,
+users will be faced with virtualized resources started behind multiple
+layers of NAT. Push based models together with lack of trust from
+the site to the image producer will result in an hostile environment
+for the virtualized resources. Kestrel aims to tackle this problem
+by looking at solutions from the instant messaging world and the XMPP
+protocol. XMPP was designed for hostile networking environments as
+well as intermittent, heterogeneous resources. XMPP has also demonstrated
+its ability to scale to hundreds of thousands of clients through deployments
+such as Google Talk and Facebook Chat, a scale that clouds will soon
+reach with the many cores era.
+
+When scaling a Virtual Organization Cluster (VOC) \cite{Murphy2009,Murphy2009a,Murphy2010}
+from a single site to multiple sites across a Wide Area Network (WAN),
+several challenges arise, including Network Address Translation (NAT)
+traversal and increased latency. The VOC workload management system
+Kestrel has been designed to address these issues and to allow for
+easier scaling of VOCs. Thus, to show Kestrel's ability to scale a
+VOC across sites, two criteria must be met. The first is that Kestrel
+must be able to acknowledge and manage a large number of worker nodes
+across NAT boundaries, and the second is that the latencies involved
+in cross-site communication should not excessively impede job dispatch
+rates.
+
+In high throughput computing, the focus is on long running tasks which
+overshadow the time spent during dispatch \cite{Tannenbaum2001,DouglasThain2006}.
+However, for many-task computing where many short lived tasks are
+typically scheduled \cite{Raicu2008}, the dispatch time can introduce
+significant overhead. For Kestrel to scale across sites, it should
+not be affected by latency during job dispatch, given tasks that take
+on the order of 30 seconds to a minute in duration to execute.
+
+
+The primary contributions of this work are:
+\begin{itemize}
+\item XMPP is presented as a fundamental communication protocol for
+building distributed systems for scientific computing.
+\item Highlight the design decisions behind the multiple iterations
+of Kestrel, based on experimental results and feedback from partner
+organizations.
+\item Performance of Kestrel, and XMPP-based systems in general,
+are demonstrated through micro-benchmarks and response delays for
+systems spanning grid sites.
+\item Large scale results from real-world scientific computing usage
+are presented showing Kestrel's potential as a cloud-based job
+scheduling overlay framework.
+\end{itemize}
+
+The remainder of this work is organized into several chapters covering related
+works (Chapter \ref{chap:Related-Work}) and background material on XMPP (Chapter
+\ref{chap:XMPP}). The architecture of Kestrel and the design choices behind
+its implementation are discussed in Chapter \ref{chap:Kestrel}. Performance
+data and results from real world usage in collaboration with STAR are presented
+in Chapter \ref{chap:Results}, with final conclusions drawn in Chapter
+\ref{chap:Conclusions}.
+
+The motivating scenario is derived from experience
+using virtual machines on Clemson University's 10,000 core Palmetto cluster in
+KVM user mode, as per administrative policy. The result is a networking environment
+in which each virtual machine is 
+
+

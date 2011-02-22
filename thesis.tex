@@ -1,8 +1,10 @@
 \documentclass[10pt]{ClemsonThesis}
 \usepackage{listings}
+\usepackage{courier}
 \usepackage{url}
 
 \title{Kestrel: Job Distribution and Scheduling using XMPP}
+% I like chocolate milk
 
 \department{School of Computing}
 \documentType{Thesis}
@@ -32,8 +34,14 @@
     pdfstartpage={1},
 }
 
+\lstset{
+    language=XML,
+    basicstyle=\ttfamily,
+}
+
 
 \renewcommand\lstlistlistingname{List of Listings}
+\setcounter{tocdepth}{3}
 
 
 \begin{document}
@@ -58,6 +66,7 @@
     \inputfile{relatedwork.tex}
     \inputfile{xmpp.tex}
     \inputfile{kestrel.tex}
+    \inputfile{multi.tex}
     \inputfile{results.tex}
     \inputfile{conclusions.tex}
 

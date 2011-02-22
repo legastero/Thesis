@@ -1,2 +1,66 @@
 \chapter{Related Work}
-Have to mention stuff
+\label{chap:Related-Work}
+Designed to scavenge unused CPU cycles, the Condor High Throughput
+Computing (HTC) system executes computationally expensive operations
+over time on machines that would otherwise go unused \cite{Tannenbaum2001,DouglasThain2006}.
+The architecture of Condor is based on linking processes together
+across the various submission and execution nodes in the cluster so
+that job data and output may be transferred. To do so, submit and
+execute nodes are directly connected to each other, bypassing the
+system's central matchmaker, once a job has been matched with an execute
+node. While this arrangement is adequate when all of the compute elements
+are in the same subnet behind a NAT boundary, using Condor with machines
+on both sides of a NAT boundary introduces complications. Falkon \cite{Raicu2007}has
+been designed to achieve high dispatch rate on large scale systems
+over-performing Condor in situation where resources are pre-allocated
+and the scheduling decision is kept to a minimum. Kestrel has similar
+features since a Kestrel pool is created once all agents have started
+in the Cloud, however Kestrel has a traditional scheduler based on
+Condor matchmaking mechanism.
+
+Several workflow engines \cite{Deelman2004,Oinn2004} and scripting
+languages \cite{Wilde2009} have been developed to run jobs efficiently
+on computational grids; they have mostly been designed with Globus
+\cite{Foster1997} grids in mind where the middleware uses gatekeepers
+to access resources. These tools can be adapted to use Clouds and
+provide a way to optimize workflow based on Cloud utility pricing
+\cite{Deelman2009}but they may not fare well in infrastructure without
+inbound network connection to virtualized resources and without shared
+file system.
+
+The BOINC \cite{Anderson2004} middleware and existing pilot job frameworks
+\cite{Maeno2008,Sfiligoi2008,Tsaregorodtsev2004} correspond to a
+pull based model that would work well in Clouds. BOINC relies on volunteers
+to contribute cycles and on communities to prepare their applications
+as a project. While a large number of projects have been created,
+BOINC is not considered a general purpose job scheduler. The pilot
+job frameworks are the closest to Kestrel. Kestrel differs in the
+use of XMPP which is a standard for messaging and offers great scaling.
+
+A solution to allow Condor to operate with NAT traversal is the Internet
+Protocol over Peer-to-Peer system, or IPOP \cite{Ganguly2006}. IPOP
+provides a generic networking stack with an underlying P2P network
+for data transmission. Unlike the regular networking stack on the
+host machine, IPOP does not require any centralized control or routing
+configuration. As a result, the pool of IPOP peers forms a virtual
+network that is able to span across NAT boundaries \cite{Ganguly2006a}.
+Since it is a full networking stack, IPOP provides TCP, UDP, and TLS/SSL
+network transports; end-user applications may run unmodified while
+using IPOP. It was used to build an autonomic Cloud overlay following
+the VOC model in \cite{Abraham2010}. Other virtual networks have
+been studied but not used in Cloud overlays \cite{Ruth2005,Tsugawa2006}.
+
+While working on optimizing meander line radio frequency identification
+(RFID) antennas, Weis and Lewis \cite{Weis2009} developed a parallelized
+computation system based on XMPP. The system was formed from a static
+pool of available hardware machines, XMPP clients for each worker
+machine, and an XMPP-based scheduler. The scheduler bootstrapped the
+system by contacting each machine in the list of workers through SSH
+and starting an XMPP agent if one was not already running. The end
+result was a specific purpose, ad-hoc grid system. Kestrel uses a
+similar architecture, but is intended as a more general purpose job
+distribution and scheduling framework. At a similar time XMPP was
+used in Bioinformatics web services \cite{Wagener2009} and used within
+the Taverna workflow engine \cite{Oinn2004} showing that other communities
+are considering XMPP as a suitable protocol for messaging and using
+it to develop new services and mechanisms.
