@@ -2,43 +2,32 @@
 \label{chap:Kestrel} 
 
 Many-Task Computing (MTC) applications span a broad range of possible
-configurations, but utilizing “large num- bers of computing resources over
-short periods of time to accomplish many computational tasks, where the primary
-metrics are in seconds” [1] is one of the emphasized aspects. Marshalling
-and releasing computational resources with the temporal granularity needed for
-such applications is prob- lematic on the grid and in overlays such as Virtual
-Organi- zation Clusters (VOC) [2, 3] where compute nodes can be created and
-destroyed on demand. Kestrel is designed to explore methods of creating a fault-
-tolerant, scalable, and cross-platform job scheduling system for heterogeneous,
-intermittently connected compute nodes. Kestrel addresses the problem posed
-by interrupted connec- tivity of both computing agents and user agents by
-building on the Extensible Messaging and Presence Protocol (XMPP) [4, 5]. The
-presence notification system provided by XMPP allows Kestrel manager nodes to
-track resource availability in the compute node pool in real time. Kestrel can
-immedi- ately remove computing node from a list of available nodes, preventing
-the scheduling of jobs on nonexistent machines. Other intermittently connected
-agents do not necessarily have to be of a computational nature. For example, a
-small swarm of robotic agents with network capabilities could be joined in a
-resource pool where scheduled jobs are physi- cal actions to be performed. The
-scale of current instant messaging systems indicates that an XMPP based frame-
-work would allow for the creation of extremely large pools of heterogeneous
-agents for real-time computing. The cross- platform criterion is achieved by
-implementing the system in Python [6] using the SleekXMPP [7] library.
+configurations, but ``utilizing large numbers of computing resources over short
+periods of time to accomplish many computational tasks, where the primary
+metrics are in seconds'' \ref{Raicu2008} is one of the emphasized aspects.
+Marshalling and releasing computational resources with the temporal granularity
+needed for such applications is problematic on the grid and in overlays such
+as Virtual Organization Clusters (VOCs) where compute nodes can be created
+and destroyed on demand, without warning, by either the initial requester or
+a grid administrator. Kestrel was designed to explore methods of creating
+a fault-tolerant, scalable, and cross-platform job scheduling system for
+heterogeneous, intermittently connected compute nodes. While a VOC is nominally
+composed of homogeneous resources through the use of a single VM image for its
+consituent nodes, such arrangements are neither guaranteed nor required.
 
-
-Started in the summer of 2009, Kestrel is a job scheduling system
-based on the Extensible Messaging and Presence Protocol, or XMPP
-\cite{RFC3920,RFC3921}. The original environment for
-which Kestrel was designed to manage was disparate collections of virtual
-machines pooled together into a single cluster, or a Virtual Organization
-Cluster (VOC) \cite{Murphy2009} as shown in figure \ref{fig:Kestrel-Arch}.
-However, compute nodes in VOCs are temporary and can be created and destroyed
-on demand, or the virtual machines may be killed by the hosting resource
-provider without warning. XMPP provides a solution for managing heterogeneous,
-intermittently connecting compute elements through the use of service discovery
-and presence notifications; Kestrel builds on these features with XMPP
-sub-protocols for requesting and dispatching tasks in such a cloud environment.
-
+Kestrel addresses the problem posed by interrupted connectivity of both
+computing agents and user agents by building on XMPP. The presence notification
+system provided by XMPP allows Kestrel manager nodes to track resource
+availability in the compute node pool in real time. Kestrel can immediately
+remove computing node from a list of available nodes, preventing the scheduling
+of jobs on nonexistent machines. Other intermittently connected agents do not
+necessarily have to be of a computational nature. For example, a small swarm
+of robotic agents with network capabilities could be joined in a resource pool
+where scheduled jobs are physical actions to be performed. The scale of current
+instant messaging systems indicates that an XMPP based frame- work would allow
+for the creation of extremely large pools of heterogeneous agents for real-time
+computing. The crossplatform criterion was achieved by implementing the system
+in Python using the SleekXMPP \cite{SleekXMPP} library.
 
 \section{Architecture}
 Based upon the traditional master-worker architecture, a Kestrel pool is made
