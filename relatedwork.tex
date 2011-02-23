@@ -50,6 +50,19 @@ using IPOP. It was used to build an autonomic Cloud overlay following
 the VOC model in \cite{Abraham2010}. Other virtual networks have
 been studied but not used in Cloud overlays \cite{Ruth2005,Tsugawa2006}.
 
+A second solution for using Condor with NAT traversal is the Generic
+Connection Broker (GCB) \cite{GCB}. GCB provides a replacement library
+for Berkeley sockets which allows a program to make normal socket I/O
+calls, but with the results brokered by an intermediary server outside
+of the NAT boundary. The main advantage of this arrangement is the 
+same as that of IPOP, namely that a full networking stack is provided which
+allows an existing application to use the NAT traversal capabilities without
+the need for rewriting the application; a simple recompilation may suffice.
+One disadvantage to this approach include causing all nodes behind the
+NAT boundary to share the same IP address, namely that of the broker server \cite{GCB2}.
+The GCB also does not provide any presence information about the nodes for
+which it brokers communications.
+
 While working on optimizing meander line radio frequency identification
 (RFID) antennas, Weis and Lewis \cite{Weis2009} developed a parallelized
 computation system based on XMPP. The system was formed from a static

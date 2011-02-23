@@ -1,5 +1,34 @@
 \chapter{Conclusions and Discussion}
 \label{chap:Conclusions}
+As demonstrated through testing,
+it is possible to construct a VOC with over 1,500 VMs on a single
+physical cluster using a single VM image without straining the network
+by using QEMU/KVM in snapshot mode. However, for the case where many
+different VM images are needed, or one VM image per worker is required,
+pre-staging VMs could still be more efficient.
+
+Establishing a VOC over a WAN is possible using XMPP. While a 0.3
+second latency would cause network I/O intensive programs, such as
+those based on MPI, to perform poorly, computationally bound applications
+such as those assumed by the VOC Model should not be affected after
+the initial dispatch. Due to the possible overlap in RTTs between
+multiple physical sites, as demonstrated by the results from Palmetto
+and Amazon EC2, it is not always possible to determine the number
+of physical sites in a VOC based on RTT data. However, future work
+on scaling Kestrel could use RTT data to pick new manager nodes to
+better distribute load and improve dispatch rates.
+
+Kestrel is able to manage a VOC effectively and distribute
+tasks with a dispatch rate of more than 1000 tasks per second. Due
+to the current scheduling algorithm, tasks that are too short will
+result in reduced performance from increased load on the manager.
+The minimum desired time was at most 2 seconds for a pool of 900 workers.
+Given the latency results found in Section \ref{sec:Latency}, using
+tasks that are at least 30 seconds in duration should be sufficient
+to mask any dispatch delays caused by latency between sites. Future
+work on Kestrel will investigate the minimum desired time for task
+execution for pool sizes into the tens of thousands.
+
 As demonstrated with a successful trial experiment with STAR, Kestrel
 is capable of managing large-scale scientific applications in the
 Cloud, with the condition that tasks are able to run independently
@@ -14,20 +43,3 @@ instances by writing changes to the VM host's local disk; the addition
 of the task cleanup command to allow for restarting the VM prevented
 exhausting the local hard drive's capacity when shared with other
 VMs.
-
-Current and future work with Kestrel will focus on using multiple
-managers for a single pool. XMPP already provides the federation infrastructure
-needed to operate a single pool with multiple XMPP servers, but more
-work is needed to federate the manager components. Through the use
-of a shared data store, such as Redis \cite{Redis}, a multi-manager
-installation can be easily achieved so long as only a single XMPP
-server is used since some implementations automatically load-balance
-components \cite{ejabberd}. Linking managers on different servers,
-in particular servers from different organizations, will require additions
-to Kestrel's protocol to create the equivalent of {}``flocking''
-between Condor systems. The current design under consideration is
-to use a distributed hash table (DHT) to spread workers amongst managers,
-and then allow managers to masquerade as a worker to other managers.
-The masquerading manager would advertise the union of its worker's
-capabilities, and would act as a task router, forwarding any received
-tasks to one of its workers that match the task.

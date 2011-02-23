@@ -1,5 +1,238 @@
 \chapter{Results}
 \label{chap:Results}
+
+When scaling a Virtual Organization Cluster (VOC)
+\cite{Murphy2009,Murphy2009a,Murphy2010} from a single site to multiple sites
+across a wide area network (WAN), several challenges arise, including Network
+Address Translation (NAT) traversal and increased latency. As Kestrel has
+been developed to provide a scheduler and dispatcher on top of an XMPP-based
+overlay for creating the VOC, its fitness for its stated objectives must be
+demonstrated. Thus, to show Kestrel's ability to act as a scheduler and overlay
+for both building and scaling a VOC across multiple sites, four criteria
+must be met. The first of these is that the system must be able to respond
+to the changes in the number of available workers as nodes are provisioned
+or decommissioned through the underlying grid mechanism. The second is that
+Kestrel must be able to acknowledge and manage a large number of worker
+nodes across NAT boundaries, and the third is that the latencies involved in
+cross-site communication should not excessively impede job dispatch rates. In
+high throughput computing, the focus is on long running tasks which overshadow
+the time spent during dispatch \cite{Tannenbaum2001,DouglasThain2006}. However,
+for many-task computing where many short lived tasks are typically scheduled
+\cite{Raicu2008}, the dispatch time can introduce significant overhead. For
+Kestrel to scale across sites, it should not be affected by latency during job
+dispatch, given tasks that take on the order of thirty seconds or a few minutes
+in duration to execute. Thus, the fourth criterion is establishing the expected
+dispatch rates for tasks in order to determine a lower bound for the desired
+task execution time.
+
+\section{Responding to Changes in VOC Size}
+\label{sec:Size-Changes}
+In order to test Kestrel's capability for responding to growing and shrinking
+worker pools based on the changing number of provisioned VMs from an underlying
+grid mechanism, a week long test monitoring this behavior was performed. The test
+consisted of first creating a worker VM image with minimal memory usage so that 
+multiple VMs could be easily started on a single physical node. Using an image
+based on Micro Core Linux \cite{MicroCoreLinux}, a minimum requirement of 32Mb
+of memory for the VM was achieved. The next phase of the test was submitting
+Condor jobs to provision VMs based on the minimal image. The intent was to flood
+idle Condor slots with Kestrel workers and track the changes in the size of the
+pool as seen by the Kestrel manager.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/week_plot}
+\label{fig:Week-Plot}
+\caption{The results of a week long test monitoring the number of available
+worker agents. A Condor job was created to queue several thousand instances of
+memory-constrained worker VMs for execution, with a second script resubmitting
+the job as needed to refill the request. Kestrel was able to recognize roughly
+4,500 simultaneous worker instances.}
+\end{figure}
+
+The results of the test as shown in figure \ref{fig:Week-Plot} indicate that a
+maximum of roughly 4,500 workers was obtained mid-week during the night. During
+the day, the number of available Condor slots reduced as expected as physical
+machines were used by other users, but spikes in idle slots during daytime usage
+did occur which the Kestrel manager was able to detect.
+
+\section{Latency}
+\label{sec:Latency}To determine the latency introduced by XMPP, a multi-site
+pool was started using Kestrel. The sites included Clemson University's Palmetto
+cluster, Amazon EC2, and CERN. The procedure for the experiment was to have a
+single node send a ``ping'' message to all the worker agents in the pool; to
+make processing easier, each ``ping'' message includes the time at which it was
+sent. These workers in turn replied to the sender with a ``pong'' message that
+included the sent time in the ``ping'' message. The current time was compared
+to the time stored in the ``pong'' message, and the round trip time (RTT) was
+calculated. Prior to running the experiment, the hypothesis was that it should
+be clear from a RTT graph that multiple sites were used in the pool since the
+data points should form clusters. A concern, however, was that the differences
+between Clemson's Palmetto cluster and Amazon's EC2 would not be distinct enough
+and would overlap.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/xmpp_rtt}
+\label{fig:Ping-Response-Times}
+\caption{The differences in response times between the three grid sites. Only the
+site at CERN produced significant latency which could distinguish worker agents from
+that site.}
+\end{figure}
+
+The results of the experiment (illustrated in Figure
+\ref{fig:Ping-Response-Times}) showed that a worker pool formed using XMPP
+can operate across multiple sites. The virtual machines at CERN responded in
+approximately 0.3 seconds whereas the the virtual machines on Palmetto and
+EC2 responded in roughly 0.1 seconds. The response times for Palmetto and
+EC2 overlapped considerably. The RTT times as measured through Kestrel were
+considerably longer than equivalent measurements through the system ping
+command, owing to the significant CPU overhead required to parse XML messages
+received via XMPP.
+
+\section{\label{sub:Pool-Sizes}Pool Sizes}
+To establish the need for a special-purpose WAN scheduler, it was
+necessary to test the scalability of disk subsystems and general-purpose
+overlay networks by starting large number of VMs, as described in
+Section \ref{sub:VM-Image-Considerations}. To compare the behavior
+of a general-purpose overlay network to a purpose-built WAN scheduler,
+an overlay combination of IPOP and Condor (section \ref{sub:IPOP/Condor-Experiment})
+was tested against Kestrel (section \ref{sub:Kestrel-Experiment})
+in an environment with pervasive NAT boundaries. If the number of
+VMs (and thus IPOP nodes) that could be instantiated on a TOP100 cluster
+did not exceed the limits of the general-purpose overlay network,
+then a special-purpose scheduler is unnecessary. 
+
+
+\subsubsection{\label{sub:VM-Image-Considerations}VM Image Considerations}
+
+The simultaneous booting of thousands of VMs has the potential to
+place considerable strain on the test cluster's disk subsystem. This
+risk was mitigated by the use of the \emph{snapshot} mode in QEMU/KVM.
+In snapshot mode, QEMU/-KVM did not write to the disk image from which
+the VM was instantiated. Instead, each instance of QEMU/KVM created
+a local copy-on-write file which overlaid the image of the original
+disk. Thus, many VMs could be instantiated from a single disk image.
+Furthermore, QEMU/KVM would only read blocks from this image as they
+were requested by the guest OS, greatly reducing the total amount
+of data that had to be transferred. The combination of these two factors
+allows the disk to be placed on a shared network store.
+
+%
+\begin{figure}
+\begin{centering}
+\includegraphics[width=1\columnwidth]{figures/1000VMboot}
+\par\end{centering}
+\caption{\label{fig:Aggregate-Disk-Throughput}Aggregate disk throughput for the two
+4Gb Fibre Channel ports on Clemson's Palmetto cluster's disk array when
+starting 1000 VMs. The observed throughput of 154Mb/sec was well below the maximum
+throughput of the two channels.}
+\end{figure}
+
+Results of a test that measured the aggregate disk throughput needed
+to boot 1000 VMs have been presented in Figure \ref{fig:Aggregate-Disk-Throughput}.
+A trace of the two 4Gb Fibre  Channel ports connected to the Clemson
+University Palmetto Cluster's disk array was obtained from the storage
+management system. Packets were automatically load-balanced between
+the two ports, reaching a peak total transfer rate of approximately
+154MB/s. This rate was well below the maximum capacity of the disk
+array. Thus it can be concluded that starting 1000 VMs with QEMU/KVM's
+snapshot mode did not place an onerous load on a cluster's disk subsystem.
+
+\subsubsection{\label{sub:IPOP/Condor-Experiment}IPOP/Condor Experiment }
+
+The scalability test for IPOP/Condor was conducted by starting a set
+of VMs using QEMU/KVM. Each VM utilized QEMU's user-mode networking
+stack for connectivity. This stack implemented a subset of the TCP/IP
+protocol and was used to provide network access to the VM without
+the need for administrative privileges on the host. Since the VM's
+network interface was not directly bridged to the the physical interface,
+the user-mode networking stack was required to implement NAT. With
+this setup, each VM was in a separate private network, maximizing
+the number of NAT traversals IPOP was required to provide. Furthermore,
+the Clemson Palmetto Cluster was located behind a NAT edge router
+to the Internet. Since the IPOP bootstraps were used for testing purposes,
+initial connections must be made through two layers of NAT, further
+stressing the overlay network.
+
+Two separate test scenarios differed in temporal characteristics.
+In the first test, a large number of IPOP nodes entered the overlay
+simultaneously. In the second test, nodes entered the overlay in a
+more incremental fashion. The total number of nodes was the same in
+both cases.
+
+In order to measure the number of nodes which entered the overlay,
+an observation node was employed. This node monitored the status of
+the Condor pool. A worker node was considered to have entered the
+overlay whenever it appeared in the Condor pool. 
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=1\columnwidth]{figures/1x200fail}
+\par\end{centering}
+\caption{\label{fig:1600-1batch}The results of starting an IPOP/Condor pool of 1600 nodes in one batch}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=1\columnwidth]{figures/200x1}
+\par\end{centering}
+\caption{\label{fig:1600-200batches}The results of starting an IPOP/Condor pool of 1600 nodes in 200
+batches}
+\end{figure}
+
+As illustrated in Figure \ref{fig:1600-1batch}, the catastrophic
+failure of the overlay when 1600 nodes attempted to enter within a
+short interval. Figure \ref{fig:1600-200batches} shows the results
+of 200 batches of 8 nodes each entering the overlay. The overlay remained
+active, but approximately 300 of the requested nodes never entered
+the overlay. Additionally the maximum number of nodes in the overlay
+at any one time was approximately 500.
+
+These tests represented a worst-case scenario for IPOP because of
+the rapid arrival of many nodes behind two layers of NAT. In this
+situation, the overlay became unbalanced, collapsing entirely.
+
+
+\subsubsection{\label{sub:Kestrel-Experiment}Kestrel Experiment} 
+As a special-purpose scheduler based on XMPP, Kestrel did not have
+to implement a full, general-purpose networking stack like IPOP. Instead,
+Kestrel performed the specific function of task scheduling and distribution.
+However, applications distributed using Kestrel would not have access
+to a full network stack except for the one provided by the VM. To
+test how well Kestrel performed, 1600 VMs were instantiated on the
+Palmetto cluster using 200 physical nodes with 8 VMs per node. As
+a measure to reduce strain on the XMPP server, each worker waited
+for a random interval of up to 30 seconds before joining the pool.
+Since XMPP uses a pull-based model, the double NAT layer does not
+pose any issues.
+
+%
+\begin{figure}
+\includegraphics[width=1\columnwidth]{figures/startup}
+\caption{\label{fig:Kestrel-Pool}Kestrel Pool of 1600 Agents}
+\end{figure}
+
+
+%
+\begin{figure}
+\includegraphics[width=1\columnwidth]{figures/Screenshot}
+\caption{\label{fig:Openfire-Showing-Available}Openfire Showing Available Agents}
+\end{figure}
+
+
+Of the 1600 VMs submitted, 1598 Kestrel worker agents started properly
+and connected to the XMPP server. From the server's web interface
+all 1598 workers could be seen online at once. 
+
+A difficulty was initially encountered that prevented the Kestrel
+pool from growing beyond approximately 900 agents. The solution was
+to increase the number of open files allowed per process in \texttt{/etc/security/limits.conf}
+where the default value is 1024 files per process. In order to test
+the scalability of Kestrel, by allowing 16384 files per process and
+starting ten worker agents per VM, further experiments have shown
+that the XMPP server can accept at least 15,000 connections at once.
+However, Kestrel job dispatching has not yet been tested on a pool
+of that size.
+
 \section{Kestrel Task Throughput and Dispatch Rates}
 
 In order to test the dispatch rate for Kestrel, four experiments were
@@ -86,186 +319,6 @@ of the life of the job, but gradually declined at the end as the remaining,
 long tasks complete and were not replaced. The scheduler was able
 to distribute 61 tasks in 0.04 seconds before a worker returned for
 another task, yielding a dispatch rate close to 1500 tasks per second.
-
-\section{Latency}
-\label{sub:Latency}To determine the latency introduced by XMPP, a
-multi-site pool was started using Kestrel. The sites included Clemson
-University's Palmetto cluster, Amazon EC2, and CERN. The procedure
-for the experiment was to have a single node send a ``ping'' message
-to all the worker agents in the pool; to make processing easier, each
-``ping'' message includes the time at which it was sent. These
-workers in turn replied to the sender with a ``pong'' message
-that included the sent time in the ``ping'' message. The current
-time was compared to the time stored in the ``pong'' message,
-and the round trip time (RTT) was calculated. Prior to running the
-experiment, the hypothesis was that it should be clear from a RTT
-graph that multiple sites were used in the pool since the data points
-should form clusters. A concern, however, was that the differences
-between Clemson's Palmetto cluster and Amazon's EC2 would not be distinct
-enough and would overlap.
-
-\begin{figure}
-\includegraphics[width=\columnwidth]{figures/xmpp_rtt}
-\caption{\label{fig:Ping-Response-Times}Ping Response Times}
-\end{figure}
-
-The results of the experiment (illustrated in Figure \ref{fig:Ping-Response-Times})
-showed that a worker pool formed using XMPP can operate across multiple
-sites. The virtual machines at CERN responded in approximately 0.3
-seconds whereas the the virtual machines on Palmetto and EC2 responded
-in roughly 0.1 seconds. The response times for Palmetto and EC2 overlapped
-considerably. The RTT times as measured through Kestrel were considerably
-longer than equivalent measurements through the system ping command,
-owing to the significant CPU overhead required to parse XML messages
-received via XMPP.
-
-\section{\label{sub:Pool-Sizes}Pool Sizes}
-
-To establish the need for a special-purpose WAN scheduler, it was
-necessary to test the scalability of disk subsystems and general-purpose
-overlay networks by starting large number of VMs, as described in
-Section \ref{sub:VM-Image-Considerations}. To compare the behavior
-of a general-purpose overlay network to a purpose-built WAN scheduler,
-an overlay combination of IPOP and Condor (section \ref{sub:IPOP/Condor-Experiment})
-was tested against Kestrel (section \ref{sub:Kestrel-Experiment})
-in an environment with pervasive NAT boundaries. If the number of
-VMs (and thus IPOP nodes) that could be instantiated on a TOP100 cluster
-did not exceed the limits of the general-purpose overlay network,
-then a special-purpose scheduler is unnecessary. 
-
-
-\subsubsection{\label{sub:VM-Image-Considerations}VM Image Considerations}
-
-The simultaneous booting of thousands of VMs has the potential to
-place considerable strain on the test cluster's disk subsystem. This
-risk was mitigated by the use of the \emph{snapshot} mode in QEMU/KVM.
-In snapshot mode, QEMU/-KVM did not write to the disk image from which
-the VM was instantiated. Instead, each instance of QEMU/KVM created
-a local copy-on-write file which overlaid the image of the original
-disk. Thus, many VMs could be instantiated from a single disk image.
-Furthermore, QEMU/KVM would only read blocks from this image as they
-were requested by the guest OS, greatly reducing the total amount
-of data that had to be transferred. The combination of these two factors
-allows the disk to be placed on a shared network store.
-
-%
-\begin{figure}
-\begin{centering}
-\includegraphics[width=1\columnwidth]{figures/1000VMboot}
-\par\end{centering}
-\caption{\label{fig:Aggregate-Disk-Throughput}Aggregate Disk Throughput when
-starting 1000 VMs}
-\end{figure}
-
-Results of a test that measured the aggregate disk throughput needed
-to boot 1000 VMs have been presented in Figure \ref{fig:Aggregate-Disk-Throughput}.
-A trace of the two 4Gb Fibre  Channel ports connected to the Clemson
-University Palmetto Cluster's disk array was obtained from the storage
-management system. Packets were automatically load-balanced between
-the two ports, reaching a peak total transfer rate of approximately
-154MB/s. This rate was well below the maximum capacity of the disk
-array. Thus it can be concluded that starting 1000 VMs with QEMU/KVM's
-snapshot mode did not place an onerous load on a cluster's disk subsystem.
-
-\subsubsection{\label{sub:IPOP/Condor-Experiment}IPOP/Condor Experiment }
-
-The scalability test for IPOP/Condor was conducted by starting a set
-of VMs using QEMU/KVM. Each VM utilized QEMU's user-mode networking
-stack for connectivity. This stack implemented a subset of the TCP/IP
-protocol and was used to provide network access to the VM without
-the need for administrative privileges on the host. Since the VM's
-network interface was not directly bridged to the the physical interface,
-the user-mode networking stack was required to implement NAT. With
-this setup, each VM was in a separate private network, maximizing
-the number of NAT traversals IPOP was required to provide. Furthermore,
-the Clemson Palmetto Cluster was located behind a NAT edge router
-to the Internet. Since the IPOP bootstraps were used for testing purposes,
-initial connections must be made through two layers of NAT, further
-stressing the overlay network.
-
-Two separate test scenarios differed in temporal characteristics.
-In the first test, a large number of IPOP nodes entered the overlay
-simultaneously. In the second test, nodes entered the overlay in a
-more incremental fashion. The total number of nodes was the same in
-both cases.
-
-In order to measure the number of nodes which entered the overlay,
-an observation node was employed. This node monitored the status of
-the Condor pool. A worker node was considered to have entered the
-overlay whenever it appeared in the Condor pool. 
-
-%
-\begin{figure}
-\begin{centering}
-\includegraphics[width=1\columnwidth]{figures/1x200fail}
-\par\end{centering}
-\caption{\label{fig:1600-1batch}IPOP/Condor pool of 1600 nodes in one batch}
-\end{figure}
-
-
-%
-\begin{figure}
-\begin{centering}
-\includegraphics[width=1\columnwidth]{figures/200x1}
-\par\end{centering}
-\caption{\label{fig:1600-200batches}IPOP/Condor pool of 1600 nodes in 200
-batches}
-\end{figure}
-
-
-As illustrated in Figure \ref{fig:1600-1batch}, the catastrophic
-failure of the overlay when 1600 nodes attempted to enter within a
-short interval. Figure \ref{fig:1600-200batches} shows the results
-of 200 batches of 8 nodes each entering the overlay. The overlay remained
-active, but approximately 300 of the requested nodes never entered
-the overlay. Additionally the maximum number of nodes in the overlay
-at any one time was approximately 500.
-
-These tests represented a worst-case scenario for IPOP because of
-the rapid arrival of many nodes behind two layers of NAT. In this
-situation, the overlay became unbalanced, collapsing entirely.
-
-
-\subsubsection{\label{sub:Kestrel-Experiment}Kestrel Experiment} 
-As a special-purpose scheduler based on XMPP, Kestrel did not have
-to implement a full, general-purpose networking stack like IPOP. Instead,
-Kestrel performed the specific function of task scheduling and distribution.
-However, applications distributed using Kestrel would not have access
-to a full network stack except for the one provided by the VM. To
-test how well Kestrel performed, 1600 VMs were instantiated on the
-Palmetto cluster using 200 physical nodes with 8 VMs per node. As
-a measure to reduce strain on the XMPP server, each worker waited
-for a random interval of up to 30 seconds before joining the pool.
-Since XMPP uses a pull-based model, the double NAT layer does not
-pose any issues.
-
-%
-\begin{figure}
-\includegraphics[width=1\columnwidth]{figures/startup}
-\caption{\label{fig:Kestrel-Pool}Kestrel Pool of 1600 Agents}
-\end{figure}
-
-
-%
-\begin{figure}
-\includegraphics[width=1\columnwidth]{figures/Screenshot}
-\caption{\label{fig:Openfire-Showing-Available}Openfire Showing Available Agents}
-\end{figure}
-
-
-Of the 1600 VMs submitted, 1598 Kestrel worker agents started properly
-and connected to the XMPP server. From the server's web interface
-all 1598 workers could be seen online at once. 
-
-A difficulty was initially encountered that prevented the Kestrel
-pool from growing beyond approximately 900 agents. The solution was
-to increase the number of open files allowed per process in \texttt{/etc/security/limits.conf}
-where the default value is 1024 files per process. In order to test
-the scalability of Kestrel, by allowing 16384 files per process and
-starting ten worker agents per VM, further experiments have shown
-that the XMPP server can accept at least 15,000 connections at once.
-However, Kestrel job dispatching has not yet been tested on a pool
-of that size.
 
 
 \section{STAR}

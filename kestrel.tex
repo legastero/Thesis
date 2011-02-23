@@ -53,8 +53,12 @@ network that allows agents to communicate freely irrespective of the underlying
 networking setup, whether on physical or virtual machines.
 
 \begin{figure}
+\includegraphics[width=\columnwidth]{figures/kestrel_network}
 \caption{The logical network communication paths for a Kestrel pool. Messages
-may be routed through at most two XMPP servers for any of the paths shown.}
+may be routed through at most two XMPP servers for any of the paths shown, 
+including the server exposing the manager components. These potential additional
+servers are indicated by the square on each path. Using XMPP's built-in federation,
+worker instances can be easily distributed across multiple XMPP servers.}
 \end{figure}
 
 \subsection{Well-Known JIDs}
@@ -80,9 +84,9 @@ made from the job's JID to the client's JID, allowing the user to easily monitor
 the status of the job from an IM client as shown in figure \ref{fig:IM-Client}
 
 \begin{figure}
-\begin{centering}
+\begin{center}
 \includegraphics[width=6cm]{figures/im_client}
-\end{centering}
+\end{center}
 \caption{\label{fig:IM-Client} Monitoring job statuses through a normal instant
 messaging client. Once accepted by the manager, jobs request to be
 added to the user's roster to deliver current status updates. Running
@@ -118,12 +122,17 @@ accepted, and assigned a JID, may be added to the user's XMPP roster
 (also referred to as a buddy list in other messaging systems). Removing
 the job from the roster will cancel the job and terminate running
 tasks. From the command line, jobs may be submitted, canceled, and
-queried for their current status using the commands shown in figure
+queried for their current status using the commands shown in table
 \ref{fig:Commands}.
 
-\begin{figure}
 \begin{lstlisting}[
-    caption={[A job status request stanza]},
+    label=fig:Status-Stanza,
+    caption={A job status request stanza and its response.
+Since the query was issued to the job submission JID, the statuses
+of all of the user's jobs are returned. Each status includes the number
+of requested, queued, running, and completed tasks. Issuing the same
+query to a job's JID would return the status of the single job.},
+    float
 ]
 <iq type="get" to="submit@manager.example.org"> 
   <query xmlns="kestrel:status" /> 
@@ -145,30 +154,21 @@ queried for their current status using the commands shown in figure
   </query> 
 </iq>
 \end{lstlisting}
-\label{fig:Status-Stanza}
-\caption{A job status request stanza and its response.
-Since the query was issued to the job submission JID, the statuses
-of all of the user's jobs are returned. Each status includes the number
-of requested, queued, running, and completed tasks. Issuing the same
-query to a job's JID would return the status of the single job.}
-\end{figure}
 
 The protocol for submitting a job, shown in figure \ref{fig:Job-Stanza},
-resembles the stanza used to initiate a task, but may also include
-a variable number of \texttt{<requires />} elements. These requirements
-may be matched against the capabilities provided by workers to ensure
-that the job will only run on VMs that have the appropriate libraries
-or belong to the proper organization. To simply the public interface
-for Kestrel through other tools, submissions must be sent to the special
-manager JID \texttt{submit@manager.example.org}.
-
-By setting the \texttt{id} attribute to a job ID and setting \texttt{action=cancel}
-in a job stanza similar to that shown in figure \ref{fig:Job-Stanza},
-a job cancellation request may be submitted.
+resembles the stanza used to initiate a task, but may also include a
+variable number of \texttt{<requires />} elements. These requirements may
+be matched against the capabilities provided by workers to ensure that the
+job will only run on VMs that have the appropriate libraries or belong
+to the proper organization. To simply the public interface for Kestrel
+through other tools, submissions must be sent to the special manager JID
+\texttt{submit@manager.example.org}. By setting the \texttt{id} attribute to a
+job ID and setting \texttt{action=cancel} in a job stanza similar to that shown
+in figure \ref{fig:Job-Stanza}, a job cancellation request may be submitted.
 
 %
-\begin{figure}
-\begin{tabular}{ll}
+\begin{table}
+\begin{tabular*}{\columnwidth}{l p{.5\columnwidth}}
 Command  & Result \\
 \hline 
 \texttt{kestrel {[}-q{]} submit <jobfile>}  & Submit a job request. \\
@@ -177,9 +177,9 @@ Command  & Result \\
 again.\\
 \texttt{kestrel {[}-q{]} status {[}<jobid>{]}}  & Request the status of all jobs or a single job. \\
 \texttt{kestrel {[}-q{]} status pool}  & Request the status of the pool. \\
-\end{tabular}\caption{\label{fig:Commands} Available commands for the command line client.}
-
-\end{figure}
+\end{tabular*}
+\caption{\label{fig:Commands} Available commands for the command line client.}
+\end{table}
 
 
 At any point, the status of a job may be directly requested instead
@@ -234,9 +234,9 @@ only need to request the original, full feature list once per unique hash it
 receives.
 
 \begin{figure}
-\begin{centering}
+\begin{center}
 \includegraphics[width=12cm]{figures/join_pool}
-\end{centering}
+\end{center}
 \caption{\label{fig:Joining-the-Pool}The presence subscription and service
 discovery process for joining the Kestrel pool. A worker first initiates
 a bi-directional presence subscription with the manager, allowing
@@ -256,7 +256,8 @@ include the \texttt{kestrel:tasks} feature in order to be accepted
 as a worker. Once the worker has been recognized, a second ``disco''
 query is issued, this time to the \texttt{kestrel:tasks:capabilities}
 node of the agent's profile. The resulting list of features are the
-capabilities that the worker offers for use during match making.}
+capabilities that the worker offers for use during match making.},
+    float
 ]
 <iq to="worker21@example.org" type="get">
   <query xmlns="http://jabber.org/protocol/disco#info" />
@@ -320,7 +321,8 @@ Various \texttt{requires} elements may be added to limit set of workers
 that may run the job's tasks. When using Kestrel to manage a single
 pool shared by various organizations, the organization's identity
 is usually added as a requirement so that the job will run on the
-organization's VMs.}
+organization's VMs.},
+    float
 ]
 <iq type="set" to="manager.example.org"> 
   <job xmlns="kestrel:job" action="submit" queue="50000"> 
@@ -380,7 +382,9 @@ to the queue to be matched with another worker.
 
 %
 \begin{figure}
+\begin{center}
 \includegraphics[height=8cm]{figures/dispatch}
+\end{center}
 \caption{\label{fig:Task-dispatching}The task dispatching and execution process.
 A match making request is triggered when the manager receives an available
 presence from a worker. If a matching job is found, a task is marked
@@ -406,9 +410,10 @@ reassigning the task to another worker.
 
 \begin{lstlisting}[
     label=fig:Task-Stanza,
-    caption={A task start stanza and an error reply. Note
+    caption={ A task start stanza and an error reply. Note
 the task's ID number is given by the resource identifier of the job's
-JID.}
+JID.},
+    float
 ]
 <iq type="set" to="worker17@example.org" 
     from="job42@manager.example.org/23">
@@ -483,9 +488,16 @@ as the precursor to the Kestrel project (under the same name).While workable,
 the design had several disadvantages that necessitated changes during the summer
 of 2010 STAR experiment.
 
-\begin{figure}
 \begin{lstlisting}[
-    caption={[A JSON formatted job submission message]}
+    label=fig:JSON-message,
+    caption={A JSON formatted message used in the initial versions of Kestrel for
+submitting a command and cleanup task; in this case the commands \texttt{./run\_program.sh}
+and \texttt{./restart\_vm.sh}. The requirements that a worker agent had to meet in order
+to accept the task are given by the list containing \texttt{Python} and \texttt{STAR}.
+To indicate that multiple copies of the command should be executed, the \texttt{queue}
+parameter was supplied with the value 1000. The initial \texttt{type} value included
+in the message was used for routing the message to the proper message handler.},
+    float
 ]
 {"type": "submit",
  "command": "./run_program.sh",
@@ -493,15 +505,6 @@ of 2010 STAR experiment.
  "requirements": ["Python", "STAR"],
  "queue": 1000}
 \end{lstlisting}
-\label{fig:JSON-message}
-\caption{A JSON formatted message used in the initial versions of Kestrel for
-submitting a command and cleanup task; in this case the commands \texttt{./run\_program.sh}
-and \texttt{./restart\_vm.sh}. The requirements that a worker agent had to meet in order
-to accept the task are given by the list containing \texttt{Python} and \texttt{STAR}.
-To indicate that multiple copies of the command should be executed, the \texttt{queue}
-parameter was supplied with the value 1000. The initial \texttt{type} value included
-in the message was used for routing the message to the proper message handler.}
-\end{figure}
 
 The first disadvantage was that combining JSON data with XMPP is an unnecessary
 step that adds overhead, both in terms of parsing time and the increase

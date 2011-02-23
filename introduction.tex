@@ -106,56 +106,45 @@ agnostic job scheduling.
 that have been adapted for Clouds.
 \end{itemize}
 While existing tools \cite{Tannenbaum2001,Deelman2009,Oinn2004,Wilde2009}
-can certainly evolve to be utilized in Clouds, this paper presents
-a new job scheduling framework specific to cloud computing thanks
-to its network agnostic feature. Named Kestrel \cite{Stout2009,Stout10},
-this framework is built using the XMPP protocol, a robust standard
-for messaging used in large scale instant messaging deployments, and
-recently adopted as the only approved instant messaging protocol for
-the Department of Defense \cite{DoDXMPP}. The assumptions and design
-principles made to create Kestrel were that traditional push models
-used in job scheduling did not meet the requirements of the users
-who developed their own job overlays on top of the traditional grid
-scheduling framework. Instead users developed their own pull model
-akin to the BOINC \cite{Anderson2004} middleware and solely used
-the grid scheduling to probe remote providers and request resources.
-This probing and request mechanism is very similar to the use of a
-cloud IaaS API. Examples of such pull based model also known as pilot
-job frameworks are PANDA \cite{Maeno2008}, DIRAC \cite{Tsaregorodtsev2004}
-and GlideinWMS \cite{Sfiligoi2008}. In addition, virtual networks
-will become extremely difficult to create due to the shortage of IPv4
-addresses and the slow adoption of IPv6. This means that increasingly,
-users will be faced with virtualized resources started behind multiple
-layers of NAT. Push based models together with lack of trust from
-the site to the image producer will result in an hostile environment
-for the virtualized resources. Kestrel aims to tackle this problem
-by looking at solutions from the instant messaging world and the XMPP
-protocol. XMPP was designed for hostile networking environments as
-well as intermittent, heterogeneous resources. XMPP has also demonstrated
-its ability to scale to hundreds of thousands of clients through deployments
-such as Google Talk and Facebook Chat, a scale that clouds will soon
-reach with the many cores era.
+can certainly evolve to be utilized in the context of a ``cloud'', the work
+presented herein describes a new job scheduling framework developed specifically
+for use in cloud computing by not relying on direct network access between
+entities. Named Kestrel \cite{Stout2009, Stout10}, this framework is based on
+the Extensible Messaging and Presence Protocol (XMPP) \cite{RFC3920, RFC3921}, a
+robust standard for messaging used in large scale instant messaging deployments,
+and recently adopted as the only approved instant messaging protocol for the
+Department of Defense \cite{DoDXMPP}. The assumptions and design principles
+made to create Kestrel were that traditional push models used in job scheduling
+did not meet the requirements of the users who developed their own job overlays
+on top of the traditional grid scheduling frameworks. Instead users developed
+their own pull model akin to the BOINC \cite{Anderson2004} middleware and solely
+used the grid scheduling to probe remote providers and request resources.
+This probing and request mechanism is very similar to the use of a cloud IaaS
+API. Examples of such pull based models, also known as pilot job frameworks,
+are PANDA \cite{Maeno2008}, DIRAC \cite{Tsaregorodtsev2004} and GlideinWMS
+\cite{Sfiligoi2008}. In addition, virtual networks will become extremely
+difficult to create due to the shortage of IPv4 addresses and the slow adoption
+of IPv6. Therefore, users increasingly will be faced with virtualized
+resources started behind multiple layers of NAT. Push based models together with
+lack of trust from the site to the image producer will result in a hostile
+environment for the virtualized resources. Kestrel aims to tackle this problem
+by looking at solutions from the instant messaging world and XMPP in particular.
+XMPP was designed for hostile networking environments as well as intermittent,
+heterogeneous resources. XMPP has also demonstrated its ability to scale to
+hundreds of thousands of clients through deployments such as Google Talk and
+Facebook Chat, a scale that clouds will soon reach with the continued deployment
+of multi-core systems.
 
-When scaling a Virtual Organization Cluster (VOC) \cite{Murphy2009,Murphy2009a,Murphy2010}
-from a single site to multiple sites across a Wide Area Network (WAN),
-several challenges arise, including Network Address Translation (NAT)
-traversal and increased latency. The VOC workload management system
-Kestrel has been designed to address these issues and to allow for
-easier scaling of VOCs. Thus, to show Kestrel's ability to scale a
-VOC across sites, two criteria must be met. The first is that Kestrel
-must be able to acknowledge and manage a large number of worker nodes
-across NAT boundaries, and the second is that the latencies involved
-in cross-site communication should not excessively impede job dispatch
-rates.
-
-In high throughput computing, the focus is on long running tasks which
-overshadow the time spent during dispatch \cite{Tannenbaum2001,DouglasThain2006}.
-However, for many-task computing where many short lived tasks are
-typically scheduled \cite{Raicu2008}, the dispatch time can introduce
-significant overhead. For Kestrel to scale across sites, it should
-not be affected by latency during job dispatch, given tasks that take
-on the order of 30 seconds to a minute in duration to execute.
-
+\section{Motivations}
+The motivating scenario is derived from experience using virtual machines on
+Clemson University's 10,000 core Palmetto cluster in KVM user mode, as per
+administrative policy. The result is a networking environment in which each
+virtual machine is behind its own layer of NAT, in addition to a NAT boundary
+imposed on the entire cluster. While it is true that different networking
+arrangements, such as bridged networking, would alleviate such conditions,
+experience shows that is not always an option. It follows that if a system which
+can perform adequately for a user's job requirements under such restrictions can
+be created, then it would also perform in more favorable network environments.
 
 The primary contributions of this work are:
 \begin{itemize}
@@ -179,10 +168,5 @@ its implementation are discussed in Chapter \ref{chap:Kestrel}. Performance
 data and results from real world usage in collaboration with STAR are presented
 in Chapter \ref{chap:Results}, with final conclusions drawn in Chapter
 \ref{chap:Conclusions}.
-
-The motivating scenario is derived from experience
-using virtual machines on Clemson University's 10,000 core Palmetto cluster in
-KVM user mode, as per administrative policy. The result is a networking environment
-in which each virtual machine is 
 
 

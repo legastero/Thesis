@@ -242,19 +242,20 @@ value is used as the \texttt{id} value of a reply stanza.
 \section{Security Considerations}
 \label{sec:Security-Considerations}
 
-In order to provide basic security to XMPP communications between clients
-and servers, the Transport Layer Security (TLS) \cite{TLS} and Simple Authentication
+In order to provide basic security to XMPP communications between clients and
+servers, the Transport Layer Security (TLS) \cite{TLS} and Simple Authentication
 and Security Layer (SASL) \cite{SASL} must be used. The use of TLS provides
-channel encryption for the XML stream to prevent tampering and eavesdropping \cite{RFC3920}.
-While it is a requirement to support the use of TLS in both client and server 
-implementations, it is still possible for a server administrator to make its
-use optional. Client agents requiring a secure channel must negotiate the use
-of TLS using the STARTLS \cite{RFC3920} stream feature. The method of encryption
-used by TLS is commonly based on digital certificates, which must be validated
-by a client agent when presented to ensure a valid chain-of-trust for the
-server's certificate; this may be done either by explicitly comparing the presented
-certificate against a known, trusted version, or checking that the certificate
-has been issued by a trusted Certificate Authority (CA).
+channel encryption for the XML stream to prevent tampering and eavesdropping
+\cite{RFC3920}. While it is a requirement to support the use of TLS in
+both client and server implementations, it is still possible for a server
+administrator to make its use optional. Client agents requiring a secure
+channel must negotiate the use of TLS using the STARTLS \cite{RFC3920} stream
+feature. The method of encryption used by TLS is commonly based on digital
+certificates, which must be validated by a client agent when presented to ensure
+a valid chain-of-trust for the server's certificate; this may be done either by
+explicitly comparing the presented certificate against a known, trusted version,
+or checking that the certificate has been issued by a trusted Certificate
+Authority (CA).
 
 While TLS prevents tampering, it does not guarantee the identity of the client
 initiating the communications. SASL provides several mechanisms for allowing
@@ -273,12 +274,12 @@ itself using a digital certificate.
 While each connection between entities in the XMPP network may be encrypted,
 the core XMPP standards do not define a method for end-to-end encryption of
 data. Several methods for achieving end-to-end encryption have been proposed,
-but a consensus has not yet been reached. An older method is documented 
-in XEP-0027: Current Jabber OpenPGP Usage \cite{XEP-0027} whereby message or
+but a consensus has not yet been reached. An older method is documented in
+XEP-0027: Current Jabber OpenPGP Usage \cite{XEP-0027} whereby message or
 presence stanza contents may be encrypted using an OpenPGP key. Unfortunately,
-IQ stanza contents can not be encrypted in this manner. A newer proposal
-uses IQ stanzas to implement a secondary communications channel, whose contents
-is encrypted using TLS \cite{XMPP-E2E}.
+IQ stanza contents can not be encrypted in this manner. A newer proposal uses
+IQ stanzas to implement a secondary communications channel, whose contents is
+encrypted using TLS \cite{XMPP-E2E}.
 
 \section{XMPP Extension Proposals (XEPs)}
 \label{sec:XEPs}
@@ -289,11 +290,11 @@ the specifications and protocols, adding new features or documenting current
 best practices. Such extensions are referred to as XMPP Extension Proposals,
 or XEPs, each of which is assigned a four digit number starting from 0001.
 XEPs are grouped into several categories, including \textit{Draft Standard},
-\textit{Final Standard}, \textit{Experimental}, \textit{Deferred}, among
-others \cite{XEP-0001}. A XEP in the final standard state is considered
-finished, and will not be updated further. A draft standard XEP is considered
-stable and reliable for implementation, while an experimental XEP is encouraged
-for implementation but may still undergo significant revision. Several XEPs are
+\textit{Final Standard}, \textit{Experimental}, \textit{Deferred}, among others
+\cite{XEP-0001}. A XEP in the final standard state is considered finished,
+and will not be updated further. A draft standard XEP is considered stable
+and reliable for implementation, while an experimental XEP is encouraged for
+implementation but may still undergo significant revision. Several XEPs are
 considered fundamental to providing robust and useful XMPP services.
 
 \subsection{Service Discovery: XEP-0030}
@@ -302,27 +303,29 @@ considered fundamental to providing robust and useful XMPP services.
 It is useful and necessary for an entity within an XMPP network to query other
 entities about their identities, supported features, and any related entities
 within the network. For this purpose, XEP-0030 Service Discovery \cite{XEP-0030}
-defines the use of ``disco'', short for service discovery, using \texttt{<iq />}
-stanzas. Disco is broken into two categories: information and items. The information
-portion is used to query and report identities and feature support. The items portion
-is used to return a list of JIDs related to an agent.
+defines the use of ``disco'', short for service discovery, using \texttt{<iq
+/>} stanzas. Disco is broken into two categories: information and items. The
+information portion is used to query and report identities and feature support.
+The items portion is used to return a list of JIDs related to an agent.
 
-An important concept introduced by XEP-0030 is the idea of a ``node'' for a JID. A node
-refers to an aspect, or facet of the services provided by a JID \cite{XEP-0030}. For
-example, an agent may provide two distinct services. By specifying a node, the disco
-query can be limited to only requesting information about one particular service.
+An important concept introduced by XEP-0030 is the idea of a ``node'' for a
+JID. A node refers to an aspect, or facet of the services provided by a JID
+\cite{XEP-0030}. For example, an agent may provide two distinct services. By
+specifying a node, the disco query can be limited to only requesting information
+about one particular service.
 
-An identity in XMPP is a combination of a \texttt{category}, \texttt{type}, \texttt{name}, and
-\texttt{lang}. The category and type values are selected from a predefined set that is used
-to identify the agent as a human facing client, or a server component providing a gateway
-service to another instant messaging network. Features are specified by listing the 
-recognized namespaces used by the supported features.
+An identity in XMPP is a combination of a \texttt{category}, \texttt{type},
+\texttt{name}, and \texttt{lang}. The category and type values are selected from
+a predefined set that is used to identify the agent as a human facing client,
+or a server component providing a gateway service to another instant messaging
+network. Features are specified by listing the recognized namespaces used by the
+supported features.
 
-An agent may also be responsible, or be the authoritative reference, for other JIDs used
-in the network. One such case would be a multi-user chat component's responsibility for
-JIDs for the chat rooms it provides. Each JID provided in the query results may also 
-include a node name to refer to particular services or information resources provided
-by a single JID.
+An agent may also be responsible, or be the authoritative reference, for other
+JIDs used in the network. One such case would be a multi-user chat component's
+responsibility for JIDs for the chat rooms it provides. Each JID provided in the
+query results may also include a node name to refer to particular services or
+information resources provided by a single JID.
 
 \subsection{Entity Capabilities: XEP-0115}
 \label{sec:Entity-Capabilities}
@@ -343,8 +346,10 @@ minimized.
 \subsection{Data Forms: XEP-0004}
 \label{sec:Data-Forms}
 
+Placeholder: Used by current research for multi-manager scenarios and clustering...
+
 
 \subsection{Ad-hoc Commands: XEP-0050}.
 \label{sec:Adhoc-Commands}
 
-
+Placeholder: Used by current research for multi-manager scenarios and clustering...
