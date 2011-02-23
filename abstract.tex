@@ -1,2 +1,46 @@
 \chapter*{Abstract}
-An abstract!
+
+A new distributed computing framework, named Kestrel, for Many-Task Computing
+(MTC) applications and implementing Virtual Organization Clusters (VOCs) is
+proposed. Kestrel is a lightweight, highly available system based on the
+Extensible Messaging and Presence Protocol (XMPP), and has been developed to
+explore XMPP-based techniques for improving MTC and VOC tolerance to faults due
+to scaling and intermittently connected heterogeneous resoureces. Kestrel provides
+a VOC with a special purpose scheduler for VOCs which can provide better scalability
+under certain workload assumptions, namely CPU bound processes and bag-of-task
+applications.
+
+Experimental results have shown that Kestrel is capable of operating
+a VOC of at least 1600 worker nodes with all nodes visible to the
+scheduler at once. When using multiple sites located in both North
+America and Europe, the latencies introduced to the round trip time
+of messages were on the order of 0.3 seconds. To offset the overhead
+of XMPP processing, a task execution time of 2 seconds is sufficient
+for a pool of 900 workers on a single site to operate at near 100\%
+use. Requiring tasks that take on the order of 30 seconds to a minute
+to execute would compensate for increased latency during job dispatch
+across multiple sites.
+
+Kestrel's architecture is rooted in pilot job frameworks heavily used in Grid
+computing, it is also modeled after the use of IRC by botnets to communica te
+between compromised machines and command and control servers. For Kestrel, the
+extensibility of XMPP has allowed development of protocols for identifying
+manager nodes, discovering the capabilities of worker agents, and for
+distributing tasks. The presence notifications provided by XMPP allow Kestrel
+to monitor the global state of the pool and to perform task dispatching based
+on worker availability. In this work it is argued that XMPP is by design a very
+good fit for cloud computing frameworks. It offers scalability, federation
+between servers and some autonomicity of the agents.
+
+During the summer of 2010, Kestrel was used and modified based on feedback from
+the STAR group at Brookhaven National Laboratories. STAR provided a virtual
+machine image with applications for simulating proton collisions using PYTHIA
+and GEANT3. A Kestrel-based virtual organization cluster, created on top of
+Clemson University's Palmetto cluster, was able to provide over 400,000 CPU
+hours of computation over the course of a month using an average of 800 virtual
+machine instances every day, generating nearly seven terabytes of data and the
+largest PYTHIA production run that STAR ever achieved. Several architectural
+issues were encountered during the course of the experiment and were resolved
+by moving from the original JSON protocols used by Kestrel to native XMPP
+equivalents that offered better message delivery confirmation and integration
+with existing tools.

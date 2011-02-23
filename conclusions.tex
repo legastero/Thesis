@@ -1,45 +1,44 @@
 \chapter{Conclusions and Discussion}
 \label{chap:Conclusions}
-As demonstrated through testing,
-it is possible to construct a VOC with over 1,500 VMs on a single
-physical cluster using a single VM image without straining the network
-by using QEMU/KVM in snapshot mode. However, for the case where many
-different VM images are needed, or one VM image per worker is required,
+
+DRAFT NOTE: This will be tweaked and completed after the results of Chapter
+\ref{chap:Clustering} have been obtained.
+
+As demonstrated through testing, it is possible to construct a VOC with over
+1,500 VMs on a single physical cluster using a single VM image without straining
+the network by using QEMU/KVM in snapshot mode. However, for the case where
+many different VM images are needed, or one VM image per worker is required,
 pre-staging VMs could still be more efficient.
 
-Establishing a VOC over a WAN is possible using XMPP. While a 0.3
-second latency would cause network I/O intensive programs, such as
-those based on MPI, to perform poorly, computationally bound applications
-such as those assumed by the VOC Model should not be affected after
-the initial dispatch. Due to the possible overlap in RTTs between
-multiple physical sites, as demonstrated by the results from Palmetto
-and Amazon EC2, it is not always possible to determine the number
-of physical sites in a VOC based on RTT data. However, future work
-on scaling Kestrel could use RTT data to pick new manager nodes to
-better distribute load and improve dispatch rates.
+Establishing a VOC over a WAN is possible using XMPP. While a 0.3 second latency
+would cause network I/O intensive programs, such as those based on MPI, to
+perform poorly, computationally bound applications such as those assumed by the
+VOC Model should not be affected after the initial dispatch. Due to the possible
+overlap in RTTs between multiple physical sites, as demonstrated by the results
+from Palmetto and Amazon EC2, it is not always possible to determine the number
+of physical sites in a VOC based on RTT data. However, future work on scaling
+Kestrel could use RTT data to pick new manager nodes to better distribute load
+and improve dispatch rates.
 
-Kestrel is able to manage a VOC effectively and distribute
-tasks with a dispatch rate of more than 1000 tasks per second. Due
-to the current scheduling algorithm, tasks that are too short will
-result in reduced performance from increased load on the manager.
-The minimum desired time was at most 2 seconds for a pool of 900 workers.
-Given the latency results found in Section \ref{sec:Latency}, using
-tasks that are at least 30 seconds in duration should be sufficient
-to mask any dispatch delays caused by latency between sites. Future
-work on Kestrel will investigate the minimum desired time for task
+Kestrel is able to manage a VOC effectively and distribute tasks with a
+dispatch rate of more than 1000 tasks per second. Due to the current scheduling
+algorithm, tasks that are too short will result in reduced performance
+from increased load on the manager. The minimum desired time was at most 2
+seconds for a pool of 900 workers. Given the latency results found in Section
+\ref{sec:Latency}, using tasks that are at least 30 seconds in duration should
+be sufficient to mask any dispatch delays caused by latency between sites.
+Future work on Kestrel will investigate the minimum desired time for task
 execution for pool sizes into the tens of thousands.
 
-As demonstrated with a successful trial experiment with STAR, Kestrel
-is capable of managing large-scale scientific applications in the
-Cloud, with the condition that tasks are able to run independently
-in a bag of tasks model. While Kestrel did not provide file transfer
-capabilities itself, offloading the responsibility to existing infrastructure
-such as HTTP servers proved to be a workable solution, handling over
-seven terabytes of output data. While the VM images used were up to
-twenty five gigabytes in size, KVM's snapshot mode reduced the startup
-times for the VMs by only transferring image data when accessed. Snapshot
-mode also prevented the main image from being modified by running
-instances by writing changes to the VM host's local disk; the addition
-of the task cleanup command to allow for restarting the VM prevented
-exhausting the local hard drive's capacity when shared with other
-VMs.
+As demonstrated with a successful trial experiment with STAR, Kestrel is
+capable of managing large-scale scientific applications in the Cloud, with the
+condition that tasks are able to run independently in a bag of tasks model.
+While Kestrel did not provide file transfer capabilities itself, offloading
+the responsibility to existing infrastructure such as HTTP servers proved to
+be a workable solution, handling over seven terabytes of output data. While
+the VM images used were up to twenty five gigabytes in size, KVM's snapshot
+mode reduced the startup times for the VMs by only transferring image data when
+accessed. Snapshot mode also prevented the main image from being modified by
+running instances by writing changes to the VM host's local disk; the addition
+of the task cleanup command to allow for restarting the VM prevented exhausting
+the local hard drive's capacity when shared with other VMs.
