@@ -320,9 +320,38 @@ long tasks complete and were not replaced. The scheduler was able
 to distribute 61 tasks in 0.04 seconds before a worker returned for
 another task, yielding a dispatch rate close to 1500 tasks per second.
 
+\section{Clustered Manager Performance}
+\label{sec:Clustered-Performance}
+
+In order to test clustering performance, the time to completion for
+jobs was measured with increasing numbers of manager instances in
+the cluster. The expectation was that completion time would decrease
+as processing time would decrease for any given instance. Figure
+\ref{fig:Clustering} shows the results of running 1000 microbenchmark
+tasks of the \texttt{sleep 0} command on 256 worker instances. Each
+manager was run in a MicroCore linux virtual machine with 512Mb of
+memory.
+
+As hypothesized, the time for job completion decreased as the number
+of clustered managers increased. The drop in time spent was due to
+the ability to both process and send XMPP stanzas in parallel. The rate of
+diminishing returns was affected by the quality of the load balancing
+between clustered instances provided by the XMPP server. While each run
+started with all manager instances processing and sending stanzas, over time
+one of two instances became favorited by the balancer, turning the arrangement
+closer to a double manager installation. Such favoritism did not impact the
+ability to achieve high availability, however. After terminating a favorited manager,
+the system was able to continue running and tracking tasks. Tweaking the load
+balancing configuration for the XMPP server may solve this issue.
+
+\begin{figure}
+\label{fig:Clustering}
+\includegraphics[width=\columnwidth]{figures/clustering}
+\caption{The relative time for job completion using an increasing number
+of clustered manager instances.}
+\end{figure}
 
 \section{STAR}
-
 \label{sec:STAR} Maintained by the Brookhaven National Laboratories,
 the STAR experiment is a multi-purpose detector at the Relativistic
 Heavy Ion Collider (RHIC) dedicated to understanding phenomena of

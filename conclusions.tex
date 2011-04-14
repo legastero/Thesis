@@ -1,8 +1,13 @@
 \chapter{Conclusions and Discussion}
 \label{chap:Conclusions}
 
-DRAFT NOTE: This will be tweaked and completed after the results of Chapter
-\ref{chap:Clustering} have been obtained.
+Kestrel is able to manage a VOC effectively and distribute tasks with a
+dispatch rate of more than 1000 tasks per second. Due to the current scheduling
+algorithm, tasks that are too short will result in reduced performance
+from increased load on the manager. The minimum desired time was at most 2
+seconds for a pool of 900 workers. Given the latency results found in Section
+\ref{sec:Latency}, using tasks that are at least 30 seconds in duration should
+be sufficient to mask any dispatch delays caused by latency between sites.
 
 As demonstrated through testing, it is possible to construct a VOC with over
 1,500 VMs on a single physical cluster using a single VM image without straining
@@ -16,19 +21,7 @@ perform poorly, computationally bound applications such as those assumed by the
 VOC Model should not be affected after the initial dispatch. Due to the possible
 overlap in RTTs between multiple physical sites, as demonstrated by the results
 from Palmetto and Amazon EC2, it is not always possible to determine the number
-of physical sites in a VOC based on RTT data. However, future work on scaling
-Kestrel could use RTT data to pick new manager nodes to better distribute load
-and improve dispatch rates.
-
-Kestrel is able to manage a VOC effectively and distribute tasks with a
-dispatch rate of more than 1000 tasks per second. Due to the current scheduling
-algorithm, tasks that are too short will result in reduced performance
-from increased load on the manager. The minimum desired time was at most 2
-seconds for a pool of 900 workers. Given the latency results found in Section
-\ref{sec:Latency}, using tasks that are at least 30 seconds in duration should
-be sufficient to mask any dispatch delays caused by latency between sites.
-Future work on Kestrel will investigate the minimum desired time for task
-execution for pool sizes into the tens of thousands.
+of physical sites in a VOC based on RTT data.
 
 As demonstrated with a successful trial experiment with STAR, Kestrel is
 capable of managing large-scale scientific applications in the Cloud, with the
@@ -42,3 +35,18 @@ accessed. Snapshot mode also prevented the main image from being modified by
 running instances by writing changes to the VM host's local disk; the addition
 of the task cleanup command to allow for restarting the VM prevented exhausting
 the local hard drive's capacity when shared with other VMs.
+
+Enabling clustering support for Kestrel is possible to allow for high
+availability and remove the single point of failure of the central manager.
+Testing has shown that increasing the number of clustered managers decreases the
+total time to completion for jobs that have short task execution times, where
+the time spent sending and processing XMPP stanzas becomes a bottleneck. The
+federated model can be extended further to a full peer-to-peer (P2P) model; as
+a federated manager exposes the same interfaces as a normal worker, it becomes
+possible to unify workers and managers. To do so, a manager would need to be
+able to execute tasks; as such, it would need to track its own state just like
+any other worker. By trading task dispatch time due to multiple hops, the
+requirement of using XMPP server components for the manager relaxes as the need
+for knowledge of other agents in the pool is reduced and the use of a server
+backed roster for a client agent becomes feasible. Future work should explore
+this form of Kestrel and try to remove the distinction between workers and managers.

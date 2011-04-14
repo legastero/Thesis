@@ -180,6 +180,23 @@ with reliable delivery, there is no guaranteed response from a \texttt{<message
 envelope for messages from a chat session between two agents. Other major uses
 include broadcasting event notices from a publish-subscribe mechanism.
 
+\begin{lstlisting}[
+    language=XML,
+    label=fig:Message-Stanza,
+    caption={A basic message stanza. The type value of ``chat'' indicates that
+    this stanza is meant to be part of a thread of conversation, or chat, like
+    one would have in a one-on-one chat in an instant messaging client. While
+    a conversation may expect a reply, there is no guarantee provided by XMPP
+    for a response stanza after sending a message stanza.},
+    float=h
+]
+<message to="eduardo@fosters.lit" 
+         from="cheese@fosters.lit" 
+         type="chat">
+  <body>I like chocolate milk.</body>
+</message>
+\end{lstlisting}
+
 \subsection{Presence}
 \label{sec:Presence}
 
@@ -238,6 +255,30 @@ the recipient could not handle the request. It is possible to associate the
 initial \texttt{<iq />} stanza with its response by examining its \texttt{id}
 attribute. Every stanza used by XMPP includes an \texttt{id} attribute, and that
 value is used as the \texttt{id} value of a reply stanza.
+
+\begin{lstlisting}[
+    label=fig:Iq-Stanza,
+    caption={A demonstration of using an Iq stanza to retrieve roster
+    information. Unlike message and presence stanzas, an Iq stanza is
+    always guaranteed a response.},
+    float=h
+]
+<iq from="mac@fosters.lit/home" 
+    type="get" 
+    id="42">
+  <query xmlns="jabber:iq:roster" />
+</iq>
+<iq to="mac@fosters.lit/home" 
+    from="mac@fosters.lit" 
+    type="result" 
+    id="42">
+  <query xmlns="jabber:iq:roster">
+    <item jid="bloo@fosters.lit" subscription="both" />
+    <item jid="frankie@fosters.lit" subscription="both" />
+    <item jid="eduardo@fosters.lit" subscription="both" />
+  </query>
+</iq>
+\end{lstlisting}
 
 \section{Security Considerations}
 \label{sec:Security-Considerations}
@@ -343,13 +384,3 @@ agents will have identical sets of identities and features, due to using the
 same underlying client libraries, the issue of excess bandwidth consumption is
 minimized.
 
-\subsection{Data Forms: XEP-0004}
-\label{sec:Data-Forms}
-
-Placeholder: Used by current research for multi-manager scenarios and clustering...
-
-
-\subsection{Ad-hoc Commands: XEP-0050}.
-\label{sec:Adhoc-Commands}
-
-Placeholder: Used by current research for multi-manager scenarios and clustering...
